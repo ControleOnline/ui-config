@@ -2,6 +2,24 @@
   <q-page padding>
     <div class="row-filters">
       <div class="col-12 col-md-4 q-mb-md text-h6 text-left">Filters</div>
+      <div>
+    <!-- Botão para a rota ModuleIndex -->
+    <q-btn 
+      :to="{ name: 'ModuleIndex' }"
+      label="ModuleIndex"
+      color="primary"
+      icon="mdi-view-dashboard"
+      class="q-mr-sm"
+    />
+
+    <!-- Botão para a rota RoleIndex -->
+    <q-btn 
+      :to="{ name: 'RoleIndex' }"
+      label="RoleIndex"
+      color="secondary"
+      icon="mdi-account-key"
+    />
+  </div>
     </div>
     <q-tabs
       :horizontal="$q.screen.gt.xs"
