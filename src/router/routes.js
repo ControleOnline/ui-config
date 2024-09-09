@@ -7,16 +7,16 @@ export const routes = [{
       path: 'menus',
       component: () =>  import ('../pages/Config/Menu.vue'),
     },    
-    {
-      name: 'ModuleIndex',
-      path: 'modules',
-      component: () =>  import ('../pages/Config/Module.vue'),
-    }, 
-    {
-      name: 'RoleIndex',
-      path: 'roles',
-      component: () =>  import ('../pages/Config/Role.vue'),
-    }, 
+    // {
+    //   name: 'ModuleIndex',
+    //   path: 'modules',
+    //   component: () =>  import ('../pages/Config/Module.vue'),
+    // }, 
+    // {
+    //   name: 'RoleIndex',
+    //   path: 'roles',
+    //   component: () =>  import ('../pages/Config/Role.vue'),
+    // }, 
   ]
 }];
 
