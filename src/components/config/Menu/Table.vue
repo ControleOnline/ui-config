@@ -1,7 +1,5 @@
 <template>
-  a
-  <DefaultTable :configs="configs" v-if="loaded && configs" />
-  b
+  <DefaultTable :configs="configs" />
 </template>
 
 <script>
@@ -12,20 +10,7 @@ export default {
     configs() {
       return {
         externalFilters: false,
-        totalItems: 50,
-        filters: false,
-        controls: false,
-        "full-height": false,
-        store: "menus",
-        title: {
-          class: "text-primary text-h6 q-mb-md",
-          icon: {
-            name: "menus",
-            size: "24px",
-            class: "q-mr-sm",
-          },
-        },
-        add: true,
+        store: "menus",        add: true,
         delete: true,
         selection: false,
         search: false,
