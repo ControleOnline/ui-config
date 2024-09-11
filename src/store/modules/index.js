@@ -11,10 +11,12 @@ import Formatter from "@controleonline/ui-common/src/utils/formatter.js";
 // "description": null
 
 
+
+
 export default {
   namespaced: true,
   state: {
-    resourceEndpoint: "menus",
+    resourceEndpoint: "modules",
     isLoading: false,
     error: "",
     violations: null,
@@ -34,44 +36,14 @@ export default {
       },
       {
         sortable: true,
-        name: "menu",
+        name: "name",
         editable: true,
-        label: "menu",
+        label: "name",
         align: "left",
         format(value, column, row) {
           return value;
         },        
       },
-      {
-        sortable: true,
-        name: "category",
-        align: "left",
-        label: "category",
-        list: "categories/getItems",
-        searchParam: "name",
-        externalFilter: true,
-        format: function (value) {
-          return value?.name;
-        },
-        style: function (value) {
-          return {
-            color: value?.category?.color,
-          };
-        },
-        saveFormat: function (value, column, row) {
-          //if (row && row["@id"])
-          return "/categories/" + parseInt(value.value || value);
-          //else return parseInt(value.value || value);
-        },
-        formatList: function (value) {
-          return value
-            ? {
-                label: value?.name,
-                value: value?.id,
-              }
-            : null;
-        },
-      },      
       {
         sortable: true,
         name: "color",
@@ -86,7 +58,13 @@ export default {
         label: "icon",
         align: "left",
       },        
-   
+      {
+        sortable: true,
+        name: "description",
+        editable: true,
+        label: "description",
+        align: "left",
+      }, 
         ],
   },
   actions: actions,
