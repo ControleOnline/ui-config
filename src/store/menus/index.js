@@ -86,7 +86,37 @@ export default {
         label: "icon",
         align: "left",
       },        
-   
+      {
+        sortable: true,
+        name: "route",
+        align: "left",
+        label: "route",
+        list: "routes/getItems",
+        searchParam: "route",
+        externalFilter: true,
+        format: function (value) {
+          return value?.name;
+        },
+        style: function (value) {
+          return {
+            color: value?.category?.color,
+          };
+        },
+        saveFormat: function (value, column, row) {
+          //if (row && row["@id"])
+          return "/routes/" + parseInt(value.value || value);
+          //else return parseInt(value.value || value);
+        },
+        formatList: function (value) {
+          console.log(value);
+          return value
+            ? {
+                label: value?.route,
+                value: value?.id,
+              }
+            : null;
+        },
+      },    
         ],
   },
   actions: actions,
