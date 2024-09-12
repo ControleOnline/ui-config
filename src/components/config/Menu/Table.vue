@@ -5,18 +5,18 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 
-
 export default {
   components: {},
 
   computed: {
     ...mapGetters({
       defaultCompany: "people/defaultCompany",
-    }), 
+    }),
     configs() {
       return {
         externalFilters: false,
         store: "menus",
+        filters: true,
         categories: ["menu"],
         add: true,
         delete: true,
@@ -32,9 +32,6 @@ export default {
         },
       };
     },
-     
   },
 };
 </script>
-
-

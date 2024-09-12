@@ -3,13 +3,10 @@ import * as getters from "@controleonline/ui-default/src/store/default/getters";
 import mutations from "@controleonline/ui-default/src/store/default/mutations";
 import Formatter from "@controleonline/ui-common/src/utils/formatter.js";
 
-
-
 // "name": "people",
 // "color": "$primary",
 // "icon": "",
 // "description": null
-
 
 export default {
   namespaced: true,
@@ -23,7 +20,7 @@ export default {
     columns: [
       {
         sortable: true,
-        isIdentity: true,        
+        isIdentity: true,
         name: "id",
         editable: false,
         label: "id",
@@ -40,7 +37,7 @@ export default {
         align: "left",
         format(value, column, row) {
           return value;
-        },        
+        },
       },
       {
         sortable: true,
@@ -71,21 +68,23 @@ export default {
               }
             : null;
         },
-      },      
+      },
       {
         sortable: true,
         name: "color",
         editable: true,
         label: "color",
         align: "left",
-      },   
+        inputType: "color",
+      },
       {
         sortable: true,
         name: "icon",
         editable: true,
         label: "icon",
         align: "left",
-      },        
+        inputType: "icon",
+      },
       {
         sortable: true,
         name: "route",
@@ -116,8 +115,8 @@ export default {
               }
             : null;
         },
-      },    
-        ],
+      },
+    ],
   },
   actions: actions,
   getters,
