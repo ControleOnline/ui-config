@@ -69,7 +69,7 @@ export default {
             : null;
         },
       },
-    
+
       {
         sortable: true,
         name: "route",
@@ -78,8 +78,8 @@ export default {
         list: "routes/getItems",
         searchParam: "route",
         externalFilter: true,
-        format: function (value) {
-          return value?.name;
+        format: function (value, column, row) {
+          return value?.route;
         },
         style: function (value) {
           return {
@@ -92,7 +92,6 @@ export default {
           //else return parseInt(value.value || value);
         },
         formatList: function (value) {
-          console.log(value);
           return value
             ? {
                 label: value?.route,
