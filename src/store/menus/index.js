@@ -69,22 +69,7 @@ export default {
             : null;
         },
       },
-      {
-        sortable: true,
-        name: "color",
-        editable: true,
-        label: "color",
-        align: "left",
-        inputType: "color",
-      },
-      {
-        sortable: true,
-        name: "icon",
-        editable: true,
-        label: "icon",
-        align: "left",
-        inputType: "icon",
-      },
+    
       {
         sortable: true,
         name: "route",
