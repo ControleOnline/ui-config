@@ -39,7 +39,7 @@ export default {
         name: "config_key",
         align: "left",
         label: "config_key",
-        externalFilter: true,
+        externalFilter: false,
         format: function (value) {
           return  value;
         },

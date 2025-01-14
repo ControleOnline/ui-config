@@ -65,7 +65,7 @@ export default {
         label: "module",
         list: "modules/getItems",
         searchParam: "route",
-        externalFilter: true,
+        externalFilter: false,
         format: function (value) {
           return value?.name;
         },

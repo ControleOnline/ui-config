@@ -46,7 +46,7 @@ export default {
         label: "category",
         list: "categories/getItems",
         searchParam: "name",
-        externalFilter: true,
+        externalFilter: false,
         format: function (value) {
           return value?.name;
         },
@@ -77,7 +77,7 @@ export default {
         label: "route",
         list: "routes/getItems",
         searchParam: "route",
-        externalFilter: true,
+        externalFilter: false,
         format: function (value, column, row) {
           return value?.route;
         },
