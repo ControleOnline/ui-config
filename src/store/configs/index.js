@@ -28,9 +28,20 @@ export default {
         name: "id",
         align: "left",
         label: "id",
-        externalFilter: true,
+        externalFilter: false,
         format: function (value) {
           return "#" + value;
+        },
+      },
+      {
+        editable: true,
+        sortable: true,
+        name: "config_key",
+        align: "left",
+        label: "config_key",
+        externalFilter: true,
+        format: function (value) {
+          return  value;
         },
       },
     ],
