@@ -8,6 +8,8 @@ import * as customGetters from "./getters";
 export default {
   namespaced: true,
   state: {
+ item:{},
+items:[],
     resourceEndpoint: "configs",
     isLoading: false,
     error: "",
