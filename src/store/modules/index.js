@@ -18,6 +18,7 @@ export default {
   state: {
  item:{},
 items:[],
+filters:{},
     resourceEndpoint: "modules",
     isLoading: false,
     error: "",

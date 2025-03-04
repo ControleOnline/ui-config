@@ -16,6 +16,7 @@ export default {
   state: {
  item:{},
 items:[],
+filters:{},
     resourceEndpoint: "routes",
     isLoading: false,
     error: "",
