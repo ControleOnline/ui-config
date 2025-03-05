@@ -13,7 +13,6 @@ export default {
   state: {
  item:{},
 items:[],
-filters:{},
     resourceEndpoint: "menus",
     isLoading: false,
     error: "",
