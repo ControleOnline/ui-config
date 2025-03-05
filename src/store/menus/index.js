@@ -62,14 +62,7 @@ items:[],
           return "/categories/" + parseInt(value.value || value);
           //else return parseInt(value.value || value);
         },
-        formatList: function (value) {
-          return value
-            ? {
-                label: value?.name,
-                value: value?.id,
-              }
-            : null;
-        },
+
       },
 
       {
@@ -93,14 +86,7 @@ items:[],
           return "/routes/" + parseInt(value.value || value);
           //else return parseInt(value.value || value);
         },
-        formatList: function (value) {
-          return value
-            ? {
-                label: value?.route,
-                value: value?.id,
-              }
-            : null;
-        },
+
       },
     ],
   },

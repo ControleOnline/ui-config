@@ -81,14 +81,7 @@ items:[],
           return "/modules/" + parseInt(value.value || value);
           //else return parseInt(value.value || value);
         },
-        formatList: function (value) {
-          return value
-            ? {
-                label: value?.name,
-                value: value?.id,
-              }
-            : null;
-        },
+
       },      
      
   
