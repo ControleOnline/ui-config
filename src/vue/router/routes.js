@@ -2,7 +2,7 @@ export const routes = [
   {
     path: "/config/",
     component: () =>
-      import("@controleonline/ui-layout/src/layouts/AdminLayout.vue"),
+      import("@controleonline/ui-layout/src/vue/layouts/AdminLayout.vue"),
     children: [
       {
         name: "MenuIndex",
