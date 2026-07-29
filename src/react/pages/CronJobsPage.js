@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useStore } from '@store';
@@ -13,7 +13,6 @@ import styles from './CronJobsPage.styles';
 
 export default function CronJobsPage() {
   const navigation = useNavigation();
-  const route = useRoute();
   const peopleStore = useStore('people');
   const themeStore = useStore('theme');
   const authStore = useStore('auth');
@@ -21,12 +20,10 @@ export default function CronJobsPage() {
   const { currentCompany, defaultCompany } = peopleStore.getters || {};
   const { user } = authStore.getters || {};
   const { colors: themeColors } = themeStore.getters || {};
-  const routePeopleId = String(route.params?.peopleId || route.params?.companyId || '').trim().replace(/\D+/g, '');
 
   const isAdminApp = app_type_base === 'ADMIN';
   const canManageCronJobs = isAdminApp && userHasRole(user, 'ROLE_SUPER');
   const mainCompany = defaultCompany || currentCompany || null;
-  const mainCompanyId = routePeopleId || mainCompany?.id || null;
 
   const palette = useMemo(
     () =>
@@ -37,13 +34,7 @@ export default function CronJobsPage() {
     [mainCompany?.id, mainCompany?.theme?.colors, themeColors],
   );
 
-  const requestParams = useMemo(
-    () =>
-      mainCompanyId
-        ? { people: `/people/${String(mainCompanyId).replace(/\D+/g, '')}` }
-        : {},
-    [mainCompanyId],
-  );
+  const requestParams = useMemo(() => ({}), []);
 
   useEffect(() => {
     navigation.setOptions({
@@ -56,7 +47,7 @@ export default function CronJobsPage() {
           onPress={() =>
             Alert.alert(
               'Jobs agendados',
-              'A lista vem do banco e os campos de ultima execucao e status sao gravados pelo comando-base.',
+              'A lista vem do banco central e o orquestrador grava ultima execucao e status no master.',
             )
           }
           style={styles.headerHelpButton}
@@ -106,17 +97,6 @@ export default function CronJobsPage() {
           <Text style={styles.deniedText}>
             Esta tela de cron jobs fica disponível apenas no app `ADMIN` para `ROLE_SUPER`.
           </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!mainCompanyId) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]} edges={['bottom']}>
-        <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={palette.primary} />
-          <Text style={styles.loadingText}>Carregando empresa principal...</Text>
         </View>
       </SafeAreaView>
     );
