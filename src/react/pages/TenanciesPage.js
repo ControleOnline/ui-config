@@ -18,7 +18,7 @@ const EMPTY_FORM = {
   dbPassword: '',
   dbDriver: 'pdo_mysql',
   dbInstance: '',
-  instalationStatus: 'pending',
+  installationStatus: 'pending',
 };
 
 const normalizeFormFromItem = item => ({
@@ -31,7 +31,7 @@ const normalizeFormFromItem = item => ({
   dbPassword: '',
   dbDriver: String(item?.dbDriver || 'pdo_mysql'),
   dbInstance: String(item?.dbInstance || ''),
-  instalationStatus: String(item?.instalationStatus || 'pending'),
+  installationStatus: String(item?.installationStatus || 'pending'),
 });
 
 const statusStyle = status => {
@@ -62,7 +62,7 @@ export default function TenanciesPage({ navigation }) {
     if (!query) return items;
 
     return items.filter(item =>
-      [item.appHost, item.dbHost, item.dbName, item.dbUser, item.instalationStatus]
+      [item.appHost, item.dbHost, item.dbName, item.dbUser, item.installationStatus]
         .some(value => String(value || '').toLowerCase().includes(query)),
     );
   }, [items, search]);
@@ -162,7 +162,7 @@ export default function TenanciesPage({ navigation }) {
             </View>
             <View style={styles.field}>
               <Text style={styles.label}>Status</Text>
-              <TextInput style={styles.input} value={form.instalationStatus} onChangeText={value => updateField('instalationStatus', value)} autoCapitalize="none" />
+              <TextInput style={styles.input} value={form.installationStatus} onChangeText={value => updateField('installationStatus', value)} autoCapitalize="none" />
             </View>
           </View>
 
@@ -195,7 +195,7 @@ export default function TenanciesPage({ navigation }) {
             <View key={String(item.id)} style={styles.row}>
               <View style={styles.rowHeader}>
                 <Text style={styles.domain}>{item.appHost}</Text>
-                <Text style={[styles.status, statusStyle(item.instalationStatus)]}>{item.instalationStatus}</Text>
+                <Text style={[styles.status, statusStyle(item.installationStatus)]}>{item.installationStatus}</Text>
               </View>
               <Text style={styles.meta}>{item.dbUser}@{item.dbHost}/{item.dbName} · {item.dbDriver}:{item.dbPort}</Text>
               <View style={styles.rowActions}>
