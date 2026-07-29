@@ -31,8 +31,8 @@ const collection = (member = []) => ({
 
 const createCompany = (configs = {}) => ({
   id: 3,
-  name: 'Gyros',
-  alias: 'GYROS',
+  name: 'Produto Exemplo',
+  alias: 'EXEMPLO',
   panel_enabled: true,
   enabled: true,
   commercial_enabled: true,
