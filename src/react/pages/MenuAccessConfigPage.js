@@ -41,6 +41,10 @@ const indexById = items =>
   Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
 
 const normalizeFeatherIcon = normalizeFeatherIconName;
+const normalizeSortOrderValue = value => {
+  const normalized = String(value ?? '').trim();
+  return normalized === '' ? '' : String(Number(normalized) || 0);
+};
 
 const toDraft = item => ({
   menu: item?.menu || item?.label || '',
@@ -194,18 +198,34 @@ export default function MenuAccessConfigPage() {
     const groups = {};
     items.forEach(item => {
       const categoryId = getId(item.category) || 'none';
+      const category = item.category || categoryById[categoryId] || {id: categoryId, name: 'Sem categoria'};
+      const categorySortOrder = Number(category?.sortOrder ?? category?.sort_order ?? 0);
       if (!groups[categoryId]) {
         groups[categoryId] = {
-          category: item.category || categoryById[categoryId] || {id: categoryId, name: 'Sem categoria'},
+          category,
           menus: [],
+          sortOrder: categorySortOrder,
         };
       }
       groups[categoryId].menus.push(item);
     });
 
-    return Object.values(groups).sort((a, b) =>
-      String(a.category?.name || '').localeCompare(String(b.category?.name || '')),
-    );
+    return Object.values(groups)
+      .map(group => ({
+        ...group,
+        menus: group.menus.sort((left, right) => {
+          const orderDiff =
+            Number(left?.sortOrder ?? left?.sort_order ?? 0) -
+            Number(right?.sortOrder ?? right?.sort_order ?? 0);
+          if (orderDiff !== 0) return orderDiff;
+          return String(left?.menu || left?.label || '').localeCompare(String(right?.menu || right?.label || ''));
+        }),
+      }))
+      .sort((a, b) => {
+        const orderDiff = Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+        if (orderDiff !== 0) return orderDiff;
+        return String(a.category?.name || '').localeCompare(String(b.category?.name || ''));
+      });
   }, [categoryById, items]);
 
   const loadMenus = useCallback(async ({preserveScroll = false} = {}) => {
@@ -242,6 +262,7 @@ export default function MenuAccessConfigPage() {
           name: category.name || '',
           icon: normalizeFeatherIcon(category.icon),
           color: category.color || '',
+          sortOrder: normalizeSortOrderValue(category.sortOrder ?? category.sort_order),
         },
       ])));
 
@@ -334,6 +355,7 @@ export default function MenuAccessConfigPage() {
         body: {
           ...draft,
           icon: normalizeFeatherIcon(draft.icon),
+          sortOrder: draft.sortOrder === '' ? null : Number(draft.sortOrder || 0),
         },
       });
       showSuccess('Categoria atualizada.');
@@ -689,6 +711,15 @@ export default function MenuAccessConfigPage() {
                     value={categoryDraft.color}
                     onChangeText={color => setCategoryDraft(categoryId, {color})}
                     placeholder="Cor"
+                  />
+                  <TextInput
+                    style={styles.orderInput}
+                    value={categoryDraft.sortOrder}
+                    keyboardType="numeric"
+                    onChangeText={sortOrder => setCategoryDraft(categoryId, {
+                      sortOrder: normalizeSortOrderValue(sortOrder),
+                    })}
+                    placeholder="Ordem"
                   />
                 </View>
 
