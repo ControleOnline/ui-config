@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import FeatherGlyphMap from 'react-native-vector-icons/glyphmaps/Feather.json';
 import {useStore} from '@store';
 import {api} from '@controleonline/ui-common/src/api';
 import {app_type_base} from '@appType';
@@ -18,6 +19,13 @@ import styles from './MenuAccessConfigPage.styles';
 
 const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE'];
 const LINK_TYPES = ['owner', 'director', 'manager', 'employee', 'salesman', 'after-sales'];
+const FEATHER_ICON_OPTIONS = Object.keys(FeatherGlyphMap)
+  .sort((left, right) => left.localeCompare(right))
+  .map(name => ({
+    id: name,
+    icon: name,
+    label: name,
+  }));
 
 const formatApiError = error => {
   if (typeof error === 'string') return error;
@@ -34,19 +42,25 @@ const getId = value => {
   return String(value).replace(/\D/g, '');
 };
 
+const indexById = items =>
+  Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
+
+const isValidFeatherIcon = value => Boolean(FeatherGlyphMap[String(value || '').trim()]);
+const normalizeFeatherIcon = value => {
+  const icon = String(value || '').trim();
+  return isValidFeatherIcon(icon) ? icon : '';
+};
+
 const toDraft = item => ({
   menu: item?.menu || item?.label || '',
   routeId: getId(item?.route),
   categoryId: getId(item?.category),
-  icon: item?.icon || item?.route?.icon || '',
+  icon: normalizeFeatherIcon(item?.icon || item?.route?.icon || ''),
   color: item?.color || item?.route?.color || '',
   sortOrder: String(item?.sortOrder ?? 0),
   enabled: item?.enabled !== false,
   linkTypes: Array.isArray(item?.linkTypes) ? item.linkTypes : [],
 });
-
-const indexById = items =>
-  Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
 
 function SelectionModal({picker, onClose}) {
   const [query, setQuery] = useState('');
@@ -87,22 +101,38 @@ function SelectionModal({picker, onClose}) {
           <ScrollView contentContainerStyle={styles.modalOptions}>
             {filteredOptions.map(option => {
               const selected = String(option.id) === String(picker.selectedId);
+              const hasIcon = Boolean(option.icon && isValidFeatherIcon(option.icon));
 
               return (
                 <TouchableOpacity
                   key={option.id}
-                  style={[styles.optionRow, selected && styles.optionRowActive]}
+                  style={[
+                    styles.optionRow,
+                    hasIcon && styles.iconOptionRow,
+                    selected && styles.optionRowActive,
+                  ]}
                   onPress={() => {
                     picker.onSelect(option);
                     onClose();
                   }}
                 >
-                  <Text style={[styles.optionText, selected && styles.optionTextActive]}>
-                    {option.label}
-                  </Text>
-                  {!!option.caption && (
-                    <Text style={styles.optionCaption}>{option.caption}</Text>
+                  {hasIcon && (
+                    <View style={styles.iconOptionGlyph}>
+                      <Icon
+                        name={option.icon}
+                        size={18}
+                        color={selected ? '#1D4ED8' : '#334155'}
+                      />
+                    </View>
                   )}
+                  <View style={styles.optionTextGroup}>
+                    <Text style={[styles.optionText, selected && styles.optionTextActive]}>
+                      {option.label}
+                    </Text>
+                    {!!option.caption && (
+                      <Text style={styles.optionCaption}>{option.caption}</Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               );
             })}
@@ -113,10 +143,44 @@ function SelectionModal({picker, onClose}) {
   );
 }
 
+function IconNameInput({onOpenPicker, placeholder = 'Buscar icone', value}) {
+  const selectedIcon = normalizeFeatherIcon(value);
+  const hasPreview = Boolean(selectedIcon);
+
+  return (
+    <TouchableOpacity
+      accessibilityLabel="Selecionar icone"
+      activeOpacity={0.82}
+      style={styles.iconSearchField}
+      onPress={onOpenPicker}
+    >
+      <View style={styles.iconSearchValue}>
+        <Icon
+          name={hasPreview ? selectedIcon : 'search'}
+          size={17}
+          color={hasPreview ? '#0F172A' : '#64748B'}
+        />
+        <Text
+          numberOfLines={1}
+          style={[
+            styles.iconSearchText,
+            !hasPreview && styles.iconSearchPlaceholder,
+          ]}
+        >
+          {selectedIcon || placeholder}
+        </Text>
+      </View>
+      <Icon name="chevron-down" size={14} color="#64748B" />
+    </TouchableOpacity>
+  );
+}
+
 export default function MenuAccessConfigPage() {
   const isAdminApp = app_type_base === 'ADMIN';
   const authStore = useStore('auth');
+  const themeStore = useStore('theme');
   const {user} = authStore.getters;
+  const {colors: themeColors = {}} = themeStore.getters || {};
   const {showError, showSuccess} = useToastMessage();
 
   const [activeAppType, setActiveAppType] = useState(isAdminApp ? 'ADMIN' : 'MANAGER');
@@ -132,10 +196,42 @@ export default function MenuAccessConfigPage() {
   const [categoryDrafts, setCategoryDrafts] = useState({});
   const [picker, setPicker] = useState(null);
   const [addDraft, setAddDraft] = useState(null);
+  const scrollViewRef = useRef(null);
+  const scrollOffsetRef = useRef(0);
 
   const canManageMenus = isAdminApp && userHasRole(user, 'ROLE_SUPER');
   const categoryById = useMemo(() => indexById(availableCategories), [availableCategories]);
   const routeById = useMemo(() => indexById(availableRoutes), [availableRoutes]);
+  const palette = useMemo(() => ({
+    buttonBackground: themeColors.buttonBackground,
+    buttonBackgroundSecondary: themeColors.buttonBackgroundSecondary,
+    buttonBorder: themeColors.buttonBorder,
+    buttonBorderSecondary: themeColors.buttonBorderSecondary,
+    buttonIcon: themeColors.buttonIcon,
+    buttonIconSecondary: themeColors.buttonIconSecondary,
+    buttonText: themeColors.buttonText,
+    buttonTextSecondary: themeColors.buttonTextSecondary,
+  }), [themeColors]);
+
+  const handleScroll = useCallback(event => {
+    scrollOffsetRef.current = Number(event?.nativeEvent?.contentOffset?.y || 0);
+  }, []);
+
+  const restoreScrollPosition = useCallback(offset => {
+    const y = Math.max(0, Number(offset || 0));
+    if (!y) return;
+
+    const scrollToPreviousOffset = () => {
+      scrollViewRef.current?.scrollTo?.({y, animated: false});
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => requestAnimationFrame(scrollToPreviousOffset));
+      return;
+    }
+
+    setTimeout(scrollToPreviousOffset, 0);
+  }, []);
 
   const categoryOptions = useMemo(() => availableCategories.map(category => ({
     id: String(category.id),
@@ -167,10 +263,14 @@ export default function MenuAccessConfigPage() {
     );
   }, [categoryById, items]);
 
-  const loadMenus = useCallback(async () => {
+  const loadMenus = useCallback(async ({preserveScroll = false} = {}) => {
     if (!canManageMenus) return;
 
-    setIsLoading(true);
+    const scrollOffsetToRestore = preserveScroll ? scrollOffsetRef.current : null;
+    if (!preserveScroll) {
+      setIsLoading(true);
+    }
+
     try {
       const response = await api.fetch('menu-config', {
         params: {
@@ -206,12 +306,18 @@ export default function MenuAccessConfigPage() {
       if (Array.isArray(response?.summary?.linkTypes)) {
         setAvailableLinkTypes(response.summary.linkTypes);
       }
+
+      if (scrollOffsetToRestore !== null) {
+        restoreScrollPosition(scrollOffsetToRestore);
+      }
     } catch (error) {
       showError(formatApiError(error));
     } finally {
-      setIsLoading(false);
+      if (!preserveScroll) {
+        setIsLoading(false);
+      }
     }
-  }, [activeAppType, canManageMenus, showError]);
+  }, [activeAppType, canManageMenus, restoreScrollPosition, showError]);
 
   useEffect(() => {
     loadMenus();
@@ -257,7 +363,7 @@ export default function MenuAccessConfigPage() {
           menu: draft.menu,
           route: draft.routeId,
           category: draft.categoryId,
-          icon: draft.icon,
+          icon: normalizeFeatherIcon(draft.icon),
           color: draft.color,
           sortOrder: Number(draft.sortOrder || 0),
           enabled: Boolean(draft.enabled),
@@ -265,7 +371,7 @@ export default function MenuAccessConfigPage() {
         },
       });
       showSuccess('Menu atualizado.');
-      await loadMenus();
+      await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
     } finally {
@@ -283,7 +389,7 @@ export default function MenuAccessConfigPage() {
         body: draft,
       });
       showSuccess('Categoria atualizada.');
-      await loadMenus();
+      await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
     } finally {
@@ -309,7 +415,7 @@ export default function MenuAccessConfigPage() {
       ...(current || {}),
       routeId: String(option.id),
       menu: current?.menu || route.route || option.label || '',
-      icon: route.icon || current?.icon || '',
+      icon: normalizeFeatherIcon(route.icon || current?.icon || ''),
       color: route.color || current?.color || '',
     }));
   };
@@ -329,7 +435,7 @@ export default function MenuAccessConfigPage() {
           route: addDraft.routeId,
           category: addDraft.categoryId,
           menu: addDraft.menu,
-          icon: addDraft.icon,
+          icon: normalizeFeatherIcon(addDraft.icon),
           color: addDraft.color,
           linkTypes: addDraft.linkTypes,
           enabled: true,
@@ -340,12 +446,21 @@ export default function MenuAccessConfigPage() {
       });
       setAddDraft(null);
       showSuccess('Menu criado.');
-      await loadMenus();
+      await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
     } finally {
       setSavingKey(null);
     }
+  };
+
+  const openIconPicker = ({onSelect, selectedIcon}) => {
+    setPicker({
+      title: 'Selecionar icone',
+      options: FEATHER_ICON_OPTIONS,
+      selectedId: normalizeFeatherIcon(selectedIcon),
+      onSelect: option => onSelect(option.id),
+    });
   };
 
   if (!isAdminApp) {
@@ -377,11 +492,17 @@ export default function MenuAccessConfigPage() {
         </View>
         <TouchableOpacity
           activeOpacity={0.82}
-          style={styles.primaryButton}
+          style={[
+            styles.primaryButton,
+            {
+              backgroundColor: palette.buttonBackground,
+              borderColor: palette.buttonBorder,
+            },
+          ]}
           onPress={() => openAddMenu('')}
         >
-          <Icon name="plus" size={15} color="#FFFFFF" />
-          <Text style={styles.primaryButtonText}>Adicionar rota</Text>
+          <Icon name="plus" size={15} color={palette.buttonIcon} />
+          <Text style={[styles.primaryButtonText, {color: palette.buttonText}]}>Adicionar rota</Text>
         </TouchableOpacity>
       </View>
 
@@ -484,11 +605,13 @@ export default function MenuAccessConfigPage() {
             </View>
             <View style={styles.fieldSmall}>
               <Text style={styles.fieldLabel}>Icone</Text>
-              <TextInput
-                style={styles.input}
+              <IconNameInput
                 value={addDraft.icon}
-                onChangeText={icon => setAddDraft(current => ({...(current || {}), icon}))}
-                placeholder="home"
+                onOpenPicker={() => openIconPicker({
+                  selectedIcon: addDraft.icon,
+                  onSelect: icon => setAddDraft(current => ({...(current || {}), icon})),
+                })}
+                placeholder="Buscar icone"
               />
             </View>
             <View style={styles.fieldSmall}>
@@ -540,11 +663,17 @@ export default function MenuAccessConfigPage() {
           <TouchableOpacity
             activeOpacity={0.82}
             disabled={savingKey === 'new-menu'}
-            style={styles.saveButton}
+            style={[
+              styles.saveButton,
+              {
+                backgroundColor: palette.buttonBackground,
+                borderColor: palette.buttonBorder,
+              },
+            ]}
             onPress={createMenu}
           >
-            <Icon name="save" size={15} color="#FFFFFF" />
-            <Text style={styles.saveButtonText}>Salvar novo menu</Text>
+            <Icon name="save" size={15} color={palette.buttonIcon} />
+            <Text style={[styles.saveButtonText, {color: palette.buttonText}]}>Salvar novo menu</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -555,7 +684,12 @@ export default function MenuAccessConfigPage() {
           <Text style={styles.centerText}>Carregando menus...</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.list}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
           {groupedItems.map(group => {
             const categoryId = getId(group.category);
             const categoryDraft = categoryDrafts[String(categoryId)] || {};
@@ -570,20 +704,32 @@ export default function MenuAccessConfigPage() {
                   <View style={styles.categoryActions}>
                     <TouchableOpacity
                       activeOpacity={0.82}
-                      style={styles.secondaryButton}
+                      style={[
+                        styles.categoryButton,
+                        {
+                          backgroundColor: palette.buttonBackground,
+                          borderColor: palette.buttonBorder,
+                        },
+                      ]}
                       onPress={() => openAddMenu(categoryId)}
                     >
-                      <Icon name="plus" size={14} color="#2563EB" />
-                      <Text style={styles.secondaryButtonText}>Adicionar</Text>
+                      <Icon name="plus" size={14} color={palette.buttonIcon} />
+                      <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Adicionar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       activeOpacity={0.82}
                       disabled={savingKey === `category-${categoryId}`}
-                      style={styles.secondaryButton}
+                      style={[
+                        styles.categoryButton,
+                        {
+                          backgroundColor: palette.buttonBackground,
+                          borderColor: palette.buttonBorder,
+                        },
+                      ]}
                       onPress={() => saveCategory(group.category)}
                     >
-                      <Icon name="save" size={14} color="#2563EB" />
-                      <Text style={styles.secondaryButtonText}>Salvar categoria</Text>
+                      <Icon name="save" size={14} color={palette.buttonIcon} />
+                      <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Salvar categoria</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -617,7 +763,7 @@ export default function MenuAccessConfigPage() {
                     const disabled = savingKey === `menu-${item.id}`;
 
                     return (
-                      <View key={item.id} style={[styles.menuRow, !draft.enabled && styles.rowDisabled]}>
+                      <View key={item.id} style={styles.menuRow}>
                         <View style={styles.menuHeader}>
                           <View style={styles.menuPreview}>
                             <Icon name={draft.icon || 'circle'} size={17} color={draft.color} />
@@ -628,11 +774,34 @@ export default function MenuAccessConfigPage() {
                           </View>
                           <TouchableOpacity
                             activeOpacity={0.82}
-                            style={[styles.enabledButton, draft.enabled && styles.enabledButtonActive]}
+                            style={[
+                              styles.enabledButton,
+                              {
+                                backgroundColor: draft.enabled
+                                  ? palette.buttonBackground
+                                  : palette.buttonBackgroundSecondary,
+                                borderColor: draft.enabled
+                                  ? palette.buttonBorder
+                                  : palette.buttonBorderSecondary,
+                              },
+                            ]}
                             onPress={() => setMenuDraft(item.id, {enabled: !draft.enabled})}
                           >
-                            <Icon name={draft.enabled ? 'eye' : 'eye-off'} size={14} color={draft.enabled ? '#FFFFFF' : '#64748B'} />
-                            <Text style={[styles.enabledText, draft.enabled && styles.enabledTextActive]}>
+                            <Icon
+                              name={draft.enabled ? 'eye' : 'eye-off'}
+                              size={14}
+                              color={draft.enabled ? palette.buttonIcon : palette.buttonIconSecondary}
+                            />
+                            <Text
+                              style={[
+                                styles.enabledText,
+                                {
+                                  color: draft.enabled
+                                    ? palette.buttonText
+                                    : palette.buttonTextSecondary,
+                                },
+                              ]}
+                            >
                               {draft.enabled ? 'Ativo' : 'Inativo'}
                             </Text>
                           </TouchableOpacity>
@@ -659,7 +828,7 @@ export default function MenuAccessConfigPage() {
                                   const selectedRoute = routeById[String(option.id)] || option;
                                   setMenuDraft(item.id, {
                                     routeId: String(option.id),
-                                    icon: selectedRoute.icon || '',
+                                    icon: normalizeFeatherIcon(selectedRoute.icon),
                                     color: selectedRoute.color || '',
                                   });
                                 },
@@ -686,10 +855,12 @@ export default function MenuAccessConfigPage() {
                           </View>
                           <View style={styles.fieldSmall}>
                             <Text style={styles.fieldLabel}>Icone da rota</Text>
-                            <TextInput
-                              style={styles.input}
+                            <IconNameInput
                               value={draft.icon}
-                              onChangeText={icon => setMenuDraft(item.id, {icon})}
+                              onOpenPicker={() => openIconPicker({
+                                selectedIcon: draft.icon,
+                                onSelect: icon => setMenuDraft(item.id, {icon}),
+                              })}
                             />
                           </View>
                           <View style={styles.fieldSmall}>
@@ -735,11 +906,17 @@ export default function MenuAccessConfigPage() {
                         <TouchableOpacity
                           activeOpacity={0.82}
                           disabled={disabled}
-                          style={styles.saveButton}
+                          style={[
+                            styles.saveButton,
+                            {
+                              backgroundColor: palette.buttonBackground,
+                              borderColor: palette.buttonBorder,
+                            },
+                          ]}
                           onPress={() => saveMenu(item)}
                         >
-                          <Icon name="save" size={15} color="#FFFFFF" />
-                          <Text style={styles.saveButtonText}>Salvar menu</Text>
+                          <Icon name="save" size={15} color={palette.buttonIcon} />
+                          <Text style={[styles.saveButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
                         </TouchableOpacity>
                       </View>
                     );
