@@ -143,7 +143,7 @@ function SelectionModal({picker, onClose}) {
   );
 }
 
-function IconNameInput({onOpenPicker, placeholder = 'Buscar icone', value}) {
+function IconNameInput({onOpenPicker, placeholder = 'Buscar icone', style, value}) {
   const selectedIcon = normalizeFeatherIcon(value);
   const hasPreview = Boolean(selectedIcon);
 
@@ -151,7 +151,7 @@ function IconNameInput({onOpenPicker, placeholder = 'Buscar icone', value}) {
     <TouchableOpacity
       accessibilityLabel="Selecionar icone"
       activeOpacity={0.82}
-      style={styles.iconSearchField}
+      style={[styles.iconSearchField, style]}
       onPress={onOpenPicker}
     >
       <View style={styles.iconSearchValue}>
@@ -295,7 +295,7 @@ export default function MenuAccessConfigPage() {
         String(category.id),
         {
           name: category.name || '',
-          icon: category.icon || '',
+          icon: normalizeFeatherIcon(category.icon),
           color: category.color || '',
         },
       ])));
@@ -386,7 +386,10 @@ export default function MenuAccessConfigPage() {
     try {
       await api.fetch(`menu-config/categories/${categoryId}`, {
         method: 'PATCH',
-        body: draft,
+        body: {
+          ...draft,
+          icon: normalizeFeatherIcon(draft.icon),
+        },
       });
       showSuccess('Categoria atualizada.');
       await loadMenus({preserveScroll: true});
@@ -693,12 +696,13 @@ export default function MenuAccessConfigPage() {
           {groupedItems.map(group => {
             const categoryId = getId(group.category);
             const categoryDraft = categoryDrafts[String(categoryId)] || {};
+            const categoryIcon = normalizeFeatherIcon(categoryDraft.icon) || 'folder';
 
             return (
               <View key={categoryId || group.category?.name} style={styles.categoryBlock}>
                 <View style={styles.categoryHeader}>
                   <View style={styles.categoryPreview}>
-                    <Icon name={categoryDraft.icon || 'folder'} size={18} color={categoryDraft.color} />
+                    <Icon name={categoryIcon} size={18} color={categoryDraft.color} />
                     <Text style={styles.categoryTitle}>{categoryDraft.name || group.category?.name}</Text>
                   </View>
                   <View style={styles.categoryActions}>
@@ -741,11 +745,14 @@ export default function MenuAccessConfigPage() {
                     onChangeText={name => setCategoryDraft(categoryId, {name})}
                     placeholder="Nome da categoria"
                   />
-                  <TextInput
-                    style={styles.compactInput}
+                  <IconNameInput
+                    style={styles.categoryIconField}
                     value={categoryDraft.icon}
-                    onChangeText={icon => setCategoryDraft(categoryId, {icon})}
-                    placeholder="Icone"
+                    onOpenPicker={() => openIconPicker({
+                      selectedIcon: categoryDraft.icon,
+                      onSelect: icon => setCategoryDraft(categoryId, {icon}),
+                    })}
+                    placeholder="Buscar icone"
                   />
                   <TextInput
                     style={styles.compactInput}

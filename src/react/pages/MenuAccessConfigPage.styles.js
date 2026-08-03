@@ -222,6 +222,10 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
+  categoryIconField: {
+    minWidth: 160,
+    width: 220,
+  },
   iconSearchValue: {
     alignItems: 'center',
     flex: 1,
