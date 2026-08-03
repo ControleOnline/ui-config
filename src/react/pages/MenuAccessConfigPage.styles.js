@@ -209,39 +209,9 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  iconSearchField: {
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
-    borderRadius: 8,
-    borderWidth: 1,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'space-between',
-    minHeight: 38,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
   categoryIconField: {
     minWidth: 160,
     width: 220,
-  },
-  iconSearchValue: {
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    gap: 8,
-    minWidth: 0,
-  },
-  iconSearchText: {
-    color: '#0F172A',
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '700',
-    minWidth: 0,
-  },
-  iconSearchPlaceholder: {
-    color: '#94A3B8',
   },
   compactInput: {
     backgroundColor: '#FFFFFF',
@@ -456,17 +426,6 @@ export default StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 9,
-  },
-  iconOptionRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 10,
-  },
-  iconOptionGlyph: {
-    alignItems: 'center',
-    height: 24,
-    justifyContent: 'center',
-    width: 24,
   },
   optionTextGroup: {
     flex: 1,

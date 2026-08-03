@@ -9,9 +9,11 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import FeatherGlyphMap from 'react-native-vector-icons/glyphmaps/Feather.json';
 import {useStore} from '@store';
 import {api} from '@controleonline/ui-common/src/api';
+import DefaultFeatherIconPicker, {
+  normalizeFeatherIconName,
+} from '@controleonline/ui-default/src/react/components/inputs/DefaultFeatherIconPicker';
 import {app_type_base} from '@appType';
 import {userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
@@ -19,13 +21,6 @@ import styles from './MenuAccessConfigPage.styles';
 
 const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE'];
 const LINK_TYPES = ['owner', 'director', 'manager', 'employee', 'salesman', 'after-sales'];
-const FEATHER_ICON_OPTIONS = Object.keys(FeatherGlyphMap)
-  .sort((left, right) => left.localeCompare(right))
-  .map(name => ({
-    id: name,
-    icon: name,
-    label: name,
-  }));
 
 const formatApiError = error => {
   if (typeof error === 'string') return error;
@@ -45,11 +40,7 @@ const getId = value => {
 const indexById = items =>
   Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
 
-const isValidFeatherIcon = value => Boolean(FeatherGlyphMap[String(value || '').trim()]);
-const normalizeFeatherIcon = value => {
-  const icon = String(value || '').trim();
-  return isValidFeatherIcon(icon) ? icon : '';
-};
+const normalizeFeatherIcon = normalizeFeatherIconName;
 
 const toDraft = item => ({
   menu: item?.menu || item?.label || '',
@@ -101,30 +92,16 @@ function SelectionModal({picker, onClose}) {
           <ScrollView contentContainerStyle={styles.modalOptions}>
             {filteredOptions.map(option => {
               const selected = String(option.id) === String(picker.selectedId);
-              const hasIcon = Boolean(option.icon && isValidFeatherIcon(option.icon));
 
               return (
                 <TouchableOpacity
                   key={option.id}
-                  style={[
-                    styles.optionRow,
-                    hasIcon && styles.iconOptionRow,
-                    selected && styles.optionRowActive,
-                  ]}
+                  style={[styles.optionRow, selected && styles.optionRowActive]}
                   onPress={() => {
                     picker.onSelect(option);
                     onClose();
                   }}
                 >
-                  {hasIcon && (
-                    <View style={styles.iconOptionGlyph}>
-                      <Icon
-                        name={option.icon}
-                        size={18}
-                        color={selected ? '#1D4ED8' : '#334155'}
-                      />
-                    </View>
-                  )}
                   <View style={styles.optionTextGroup}>
                     <Text style={[styles.optionText, selected && styles.optionTextActive]}>
                       {option.label}
@@ -140,38 +117,6 @@ function SelectionModal({picker, onClose}) {
         </View>
       </View>
     </Modal>
-  );
-}
-
-function IconNameInput({onOpenPicker, placeholder = 'Buscar icone', style, value}) {
-  const selectedIcon = normalizeFeatherIcon(value);
-  const hasPreview = Boolean(selectedIcon);
-
-  return (
-    <TouchableOpacity
-      accessibilityLabel="Selecionar icone"
-      activeOpacity={0.82}
-      style={[styles.iconSearchField, style]}
-      onPress={onOpenPicker}
-    >
-      <View style={styles.iconSearchValue}>
-        <Icon
-          name={hasPreview ? selectedIcon : 'search'}
-          size={17}
-          color={hasPreview ? '#0F172A' : '#64748B'}
-        />
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.iconSearchText,
-            !hasPreview && styles.iconSearchPlaceholder,
-          ]}
-        >
-          {selectedIcon || placeholder}
-        </Text>
-      </View>
-      <Icon name="chevron-down" size={14} color="#64748B" />
-    </TouchableOpacity>
   );
 }
 
@@ -457,15 +402,6 @@ export default function MenuAccessConfigPage() {
     }
   };
 
-  const openIconPicker = ({onSelect, selectedIcon}) => {
-    setPicker({
-      title: 'Selecionar icone',
-      options: FEATHER_ICON_OPTIONS,
-      selectedId: normalizeFeatherIcon(selectedIcon),
-      onSelect: option => onSelect(option.id),
-    });
-  };
-
   if (!isAdminApp) {
     return (
       <View style={styles.centerState}>
@@ -608,12 +544,9 @@ export default function MenuAccessConfigPage() {
             </View>
             <View style={styles.fieldSmall}>
               <Text style={styles.fieldLabel}>Icone</Text>
-              <IconNameInput
+              <DefaultFeatherIconPicker
                 value={addDraft.icon}
-                onOpenPicker={() => openIconPicker({
-                  selectedIcon: addDraft.icon,
-                  onSelect: icon => setAddDraft(current => ({...(current || {}), icon})),
-                })}
+                onChange={icon => setAddDraft(current => ({...(current || {}), icon}))}
                 placeholder="Buscar icone"
               />
             </View>
@@ -745,13 +678,10 @@ export default function MenuAccessConfigPage() {
                     onChangeText={name => setCategoryDraft(categoryId, {name})}
                     placeholder="Nome da categoria"
                   />
-                  <IconNameInput
+                  <DefaultFeatherIconPicker
                     style={styles.categoryIconField}
                     value={categoryDraft.icon}
-                    onOpenPicker={() => openIconPicker({
-                      selectedIcon: categoryDraft.icon,
-                      onSelect: icon => setCategoryDraft(categoryId, {icon}),
-                    })}
+                    onChange={icon => setCategoryDraft(categoryId, {icon})}
                     placeholder="Buscar icone"
                   />
                   <TextInput
@@ -862,12 +792,9 @@ export default function MenuAccessConfigPage() {
                           </View>
                           <View style={styles.fieldSmall}>
                             <Text style={styles.fieldLabel}>Icone da rota</Text>
-                            <IconNameInput
+                            <DefaultFeatherIconPicker
                               value={draft.icon}
-                              onOpenPicker={() => openIconPicker({
-                                selectedIcon: draft.icon,
-                                onSelect: icon => setMenuDraft(item.id, {icon}),
-                              })}
+                              onChange={icon => setMenuDraft(item.id, {icon})}
                             />
                           </View>
                           <View style={styles.fieldSmall}>
