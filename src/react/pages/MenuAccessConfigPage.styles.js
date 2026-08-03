@@ -278,8 +278,6 @@ export default StyleSheet.create({
   },
   linkButton: {
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderColor: '#E2E8F0',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -287,17 +285,9 @@ export default StyleSheet.create({
     minHeight: 34,
     paddingHorizontal: 10,
   },
-  linkButtonActive: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#93C5FD',
-  },
   linkText: {
-    color: '#64748B',
     fontSize: 12,
     fontWeight: '700',
-  },
-  linkTextActive: {
-    color: '#1D4ED8',
   },
   primaryButton: {
     alignItems: 'center',

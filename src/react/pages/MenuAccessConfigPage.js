@@ -319,6 +319,44 @@ export default function MenuAccessConfigPage() {
     setMenuDraft(itemId, {linkTypes: next});
   };
 
+  const renderLinkTypeButton = ({key, linkType, selected, disabled = false, onPress}) => (
+    <TouchableOpacity
+      key={key || linkType}
+      activeOpacity={0.82}
+      disabled={disabled}
+      style={[
+        styles.linkButton,
+        {
+          backgroundColor: selected
+            ? palette.buttonBackground
+            : palette.buttonBackgroundSecondary,
+          borderColor: selected
+            ? palette.buttonBorder
+            : palette.buttonBorderSecondary,
+        },
+      ]}
+      onPress={onPress}
+    >
+      <Icon
+        name={selected ? 'check-square' : 'square'}
+        size={14}
+        color={selected ? palette.buttonIcon : palette.buttonIconSecondary}
+      />
+      <Text
+        style={[
+          styles.linkText,
+          {
+            color: selected
+              ? palette.buttonText
+              : palette.buttonTextSecondary,
+          },
+        ]}
+      >
+        {linkTypeLabel(linkType)}
+      </Text>
+    </TouchableOpacity>
+  );
+
   const saveMenu = async item => {
     const draft = menuDrafts[String(item.id)] || toDraft(item);
     setSavingKey(`menu-${item.id}`);
@@ -595,12 +633,11 @@ export default function MenuAccessConfigPage() {
             {availableLinkTypes.map(linkType => {
               const active = addDraft.linkTypes.includes(linkType);
 
-              return (
-                <TouchableOpacity
-                  key={`new-${linkType}`}
-                  activeOpacity={0.82}
-                  style={[styles.linkButton, active && styles.linkButtonActive]}
-                  onPress={() => setAddDraft(current => {
+              return renderLinkTypeButton({
+                key: `new-${linkType}`,
+                linkType,
+                selected: active,
+                onPress: () => setAddDraft(current => {
                     const selected = current?.linkTypes || [];
                     return {
                       ...(current || {}),
@@ -608,14 +645,8 @@ export default function MenuAccessConfigPage() {
                         ? selected.filter(value => value !== linkType)
                         : [...selected, linkType],
                     };
-                  })}
-                >
-                  <Icon name={active ? 'check-square' : 'square'} size={14} color={active ? '#2563EB' : '#94A3B8'} />
-                  <Text style={[styles.linkText, active && styles.linkTextActive]}>
-                    {linkTypeLabel(linkType)}
-                  </Text>
-                </TouchableOpacity>
-              );
+                  }),
+              });
             })}
           </View>
           <TouchableOpacity
@@ -851,20 +882,13 @@ export default function MenuAccessConfigPage() {
                           {availableLinkTypes.map(linkType => {
                             const selected = draft.linkTypes.includes(linkType);
 
-                            return (
-                              <TouchableOpacity
-                                key={`${item.id}-${linkType}`}
-                                activeOpacity={0.82}
-                                disabled={disabled}
-                                style={[styles.linkButton, selected && styles.linkButtonActive]}
-                                onPress={() => toggleDraftLinkType(item.id, linkType)}
-                              >
-                                <Icon name={selected ? 'check-square' : 'square'} size={14} color={selected ? '#2563EB' : '#94A3B8'} />
-                                <Text style={[styles.linkText, selected && styles.linkTextActive]}>
-                                  {linkTypeLabel(linkType)}
-                                </Text>
-                              </TouchableOpacity>
-                            );
+                            return renderLinkTypeButton({
+                              key: `${item.id}-${linkType}`,
+                              linkType,
+                              selected,
+                              disabled,
+                              onPress: () => toggleDraftLinkType(item.id, linkType),
+                            });
                           })}
                         </View>
 
