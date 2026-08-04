@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -11,6 +11,9 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import {useStore} from '@store';
 import {api} from '@controleonline/ui-common/src/api';
+import DefaultFeatherIconPicker, {
+  normalizeFeatherIconName,
+} from '@controleonline/ui-default/src/react/components/inputs/DefaultFeatherIconPicker';
 import {app_type_base} from '@appType';
 import {userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
@@ -34,19 +37,25 @@ const getId = value => {
   return String(value).replace(/\D/g, '');
 };
 
+const indexById = items =>
+  Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
+
+const normalizeFeatherIcon = normalizeFeatherIconName;
+const normalizeSortOrderValue = value => {
+  const normalized = String(value ?? '').trim();
+  return normalized === '' ? '' : String(Number(normalized) || 0);
+};
+
 const toDraft = item => ({
   menu: item?.menu || item?.label || '',
   routeId: getId(item?.route),
   categoryId: getId(item?.category),
-  icon: item?.icon || item?.route?.icon || '',
+  icon: normalizeFeatherIcon(item?.icon || item?.route?.icon || ''),
   color: item?.color || item?.route?.color || '',
   sortOrder: String(item?.sortOrder ?? 0),
   enabled: item?.enabled !== false,
   linkTypes: Array.isArray(item?.linkTypes) ? item.linkTypes : [],
 });
-
-const indexById = items =>
-  Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
 
 function SelectionModal({picker, onClose}) {
   const [query, setQuery] = useState('');
@@ -97,12 +106,14 @@ function SelectionModal({picker, onClose}) {
                     onClose();
                   }}
                 >
-                  <Text style={[styles.optionText, selected && styles.optionTextActive]}>
-                    {option.label}
-                  </Text>
-                  {!!option.caption && (
-                    <Text style={styles.optionCaption}>{option.caption}</Text>
-                  )}
+                  <View style={styles.optionTextGroup}>
+                    <Text style={[styles.optionText, selected && styles.optionTextActive]}>
+                      {option.label}
+                    </Text>
+                    {!!option.caption && (
+                      <Text style={styles.optionCaption}>{option.caption}</Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               );
             })}
@@ -116,7 +127,9 @@ function SelectionModal({picker, onClose}) {
 export default function MenuAccessConfigPage() {
   const isAdminApp = app_type_base === 'ADMIN';
   const authStore = useStore('auth');
+  const themeStore = useStore('theme');
   const {user} = authStore.getters;
+  const {colors: themeColors = {}} = themeStore.getters || {};
   const {showError, showSuccess} = useToastMessage();
 
   const [activeAppType, setActiveAppType] = useState(isAdminApp ? 'ADMIN' : 'MANAGER');
@@ -132,10 +145,42 @@ export default function MenuAccessConfigPage() {
   const [categoryDrafts, setCategoryDrafts] = useState({});
   const [picker, setPicker] = useState(null);
   const [addDraft, setAddDraft] = useState(null);
+  const scrollViewRef = useRef(null);
+  const scrollOffsetRef = useRef(0);
 
   const canManageMenus = isAdminApp && userHasRole(user, 'ROLE_SUPER');
   const categoryById = useMemo(() => indexById(availableCategories), [availableCategories]);
   const routeById = useMemo(() => indexById(availableRoutes), [availableRoutes]);
+  const palette = useMemo(() => ({
+    buttonBackground: themeColors.buttonBackground,
+    buttonBackgroundSecondary: themeColors.buttonBackgroundSecondary,
+    buttonBorder: themeColors.buttonBorder,
+    buttonBorderSecondary: themeColors.buttonBorderSecondary,
+    buttonIcon: themeColors.buttonIcon,
+    buttonIconSecondary: themeColors.buttonIconSecondary,
+    buttonText: themeColors.buttonText,
+    buttonTextSecondary: themeColors.buttonTextSecondary,
+  }), [themeColors]);
+
+  const handleScroll = useCallback(event => {
+    scrollOffsetRef.current = Number(event?.nativeEvent?.contentOffset?.y || 0);
+  }, []);
+
+  const restoreScrollPosition = useCallback(offset => {
+    const y = Math.max(0, Number(offset || 0));
+    if (!y) return;
+
+    const scrollToPreviousOffset = () => {
+      scrollViewRef.current?.scrollTo?.({y, animated: false});
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => requestAnimationFrame(scrollToPreviousOffset));
+      return;
+    }
+
+    setTimeout(scrollToPreviousOffset, 0);
+  }, []);
 
   const categoryOptions = useMemo(() => availableCategories.map(category => ({
     id: String(category.id),
@@ -153,24 +198,44 @@ export default function MenuAccessConfigPage() {
     const groups = {};
     items.forEach(item => {
       const categoryId = getId(item.category) || 'none';
+      const category = item.category || categoryById[categoryId] || {id: categoryId, name: 'Sem categoria'};
+      const categorySortOrder = Number(category?.sortOrder ?? category?.sort_order ?? 0);
       if (!groups[categoryId]) {
         groups[categoryId] = {
-          category: item.category || categoryById[categoryId] || {id: categoryId, name: 'Sem categoria'},
+          category,
           menus: [],
+          sortOrder: categorySortOrder,
         };
       }
       groups[categoryId].menus.push(item);
     });
 
-    return Object.values(groups).sort((a, b) =>
-      String(a.category?.name || '').localeCompare(String(b.category?.name || '')),
-    );
+    return Object.values(groups)
+      .map(group => ({
+        ...group,
+        menus: group.menus.sort((left, right) => {
+          const orderDiff =
+            Number(left?.sortOrder ?? left?.sort_order ?? 0) -
+            Number(right?.sortOrder ?? right?.sort_order ?? 0);
+          if (orderDiff !== 0) return orderDiff;
+          return String(left?.menu || left?.label || '').localeCompare(String(right?.menu || right?.label || ''));
+        }),
+      }))
+      .sort((a, b) => {
+        const orderDiff = Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+        if (orderDiff !== 0) return orderDiff;
+        return String(a.category?.name || '').localeCompare(String(b.category?.name || ''));
+      });
   }, [categoryById, items]);
 
-  const loadMenus = useCallback(async () => {
+  const loadMenus = useCallback(async ({preserveScroll = false} = {}) => {
     if (!canManageMenus) return;
 
-    setIsLoading(true);
+    const scrollOffsetToRestore = preserveScroll ? scrollOffsetRef.current : null;
+    if (!preserveScroll) {
+      setIsLoading(true);
+    }
+
     try {
       const response = await api.fetch('menu-config', {
         params: {
@@ -195,8 +260,9 @@ export default function MenuAccessConfigPage() {
         String(category.id),
         {
           name: category.name || '',
-          icon: category.icon || '',
+          icon: normalizeFeatherIcon(category.icon),
           color: category.color || '',
+          sortOrder: normalizeSortOrderValue(category.sortOrder ?? category.sort_order),
         },
       ])));
 
@@ -206,12 +272,18 @@ export default function MenuAccessConfigPage() {
       if (Array.isArray(response?.summary?.linkTypes)) {
         setAvailableLinkTypes(response.summary.linkTypes);
       }
+
+      if (scrollOffsetToRestore !== null) {
+        restoreScrollPosition(scrollOffsetToRestore);
+      }
     } catch (error) {
       showError(formatApiError(error));
     } finally {
-      setIsLoading(false);
+      if (!preserveScroll) {
+        setIsLoading(false);
+      }
     }
-  }, [activeAppType, canManageMenus, showError]);
+  }, [activeAppType, canManageMenus, restoreScrollPosition, showError]);
 
   useEffect(() => {
     loadMenus();
@@ -247,6 +319,44 @@ export default function MenuAccessConfigPage() {
     setMenuDraft(itemId, {linkTypes: next});
   };
 
+  const renderLinkTypeButton = ({key, linkType, selected, disabled = false, onPress}) => (
+    <TouchableOpacity
+      key={key || linkType}
+      activeOpacity={0.82}
+      disabled={disabled}
+      style={[
+        styles.linkButton,
+        {
+          backgroundColor: selected
+            ? palette.buttonBackground
+            : palette.buttonBackgroundSecondary,
+          borderColor: selected
+            ? palette.buttonBorder
+            : palette.buttonBorderSecondary,
+        },
+      ]}
+      onPress={onPress}
+    >
+      <Icon
+        name={selected ? 'check-square' : 'square'}
+        size={14}
+        color={selected ? palette.buttonIcon : palette.buttonIconSecondary}
+      />
+      <Text
+        style={[
+          styles.linkText,
+          {
+            color: selected
+              ? palette.buttonText
+              : palette.buttonTextSecondary,
+          },
+        ]}
+      >
+        {linkTypeLabel(linkType)}
+      </Text>
+    </TouchableOpacity>
+  );
+
   const saveMenu = async item => {
     const draft = menuDrafts[String(item.id)] || toDraft(item);
     setSavingKey(`menu-${item.id}`);
@@ -257,7 +367,7 @@ export default function MenuAccessConfigPage() {
           menu: draft.menu,
           route: draft.routeId,
           category: draft.categoryId,
-          icon: draft.icon,
+          icon: normalizeFeatherIcon(draft.icon),
           color: draft.color,
           sortOrder: Number(draft.sortOrder || 0),
           enabled: Boolean(draft.enabled),
@@ -265,7 +375,7 @@ export default function MenuAccessConfigPage() {
         },
       });
       showSuccess('Menu atualizado.');
-      await loadMenus();
+      await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
     } finally {
@@ -280,10 +390,14 @@ export default function MenuAccessConfigPage() {
     try {
       await api.fetch(`menu-config/categories/${categoryId}`, {
         method: 'PATCH',
-        body: draft,
+        body: {
+          ...draft,
+          icon: normalizeFeatherIcon(draft.icon),
+          sortOrder: draft.sortOrder === '' ? null : Number(draft.sortOrder || 0),
+        },
       });
       showSuccess('Categoria atualizada.');
-      await loadMenus();
+      await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
     } finally {
@@ -309,7 +423,7 @@ export default function MenuAccessConfigPage() {
       ...(current || {}),
       routeId: String(option.id),
       menu: current?.menu || route.route || option.label || '',
-      icon: route.icon || current?.icon || '',
+      icon: normalizeFeatherIcon(route.icon || current?.icon || ''),
       color: route.color || current?.color || '',
     }));
   };
@@ -329,7 +443,7 @@ export default function MenuAccessConfigPage() {
           route: addDraft.routeId,
           category: addDraft.categoryId,
           menu: addDraft.menu,
-          icon: addDraft.icon,
+          icon: normalizeFeatherIcon(addDraft.icon),
           color: addDraft.color,
           linkTypes: addDraft.linkTypes,
           enabled: true,
@@ -340,7 +454,7 @@ export default function MenuAccessConfigPage() {
       });
       setAddDraft(null);
       showSuccess('Menu criado.');
-      await loadMenus();
+      await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
     } finally {
@@ -377,11 +491,17 @@ export default function MenuAccessConfigPage() {
         </View>
         <TouchableOpacity
           activeOpacity={0.82}
-          style={styles.primaryButton}
+          style={[
+            styles.primaryButton,
+            {
+              backgroundColor: palette.buttonBackground,
+              borderColor: palette.buttonBorder,
+            },
+          ]}
           onPress={() => openAddMenu('')}
         >
-          <Icon name="plus" size={15} color="#FFFFFF" />
-          <Text style={styles.primaryButtonText}>Adicionar rota</Text>
+          <Icon name="plus" size={15} color={palette.buttonIcon} />
+          <Text style={[styles.primaryButtonText, {color: palette.buttonText}]}>Adicionar rota</Text>
         </TouchableOpacity>
       </View>
 
@@ -484,11 +604,10 @@ export default function MenuAccessConfigPage() {
             </View>
             <View style={styles.fieldSmall}>
               <Text style={styles.fieldLabel}>Icone</Text>
-              <TextInput
-                style={styles.input}
+              <DefaultFeatherIconPicker
                 value={addDraft.icon}
-                onChangeText={icon => setAddDraft(current => ({...(current || {}), icon}))}
-                placeholder="home"
+                onChange={icon => setAddDraft(current => ({...(current || {}), icon}))}
+                placeholder="Buscar icone"
               />
             </View>
             <View style={styles.fieldSmall}>
@@ -514,12 +633,11 @@ export default function MenuAccessConfigPage() {
             {availableLinkTypes.map(linkType => {
               const active = addDraft.linkTypes.includes(linkType);
 
-              return (
-                <TouchableOpacity
-                  key={`new-${linkType}`}
-                  activeOpacity={0.82}
-                  style={[styles.linkButton, active && styles.linkButtonActive]}
-                  onPress={() => setAddDraft(current => {
+              return renderLinkTypeButton({
+                key: `new-${linkType}`,
+                linkType,
+                selected: active,
+                onPress: () => setAddDraft(current => {
                     const selected = current?.linkTypes || [];
                     return {
                       ...(current || {}),
@@ -527,24 +645,24 @@ export default function MenuAccessConfigPage() {
                         ? selected.filter(value => value !== linkType)
                         : [...selected, linkType],
                     };
-                  })}
-                >
-                  <Icon name={active ? 'check-square' : 'square'} size={14} color={active ? '#2563EB' : '#94A3B8'} />
-                  <Text style={[styles.linkText, active && styles.linkTextActive]}>
-                    {linkTypeLabel(linkType)}
-                  </Text>
-                </TouchableOpacity>
-              );
+                  }),
+              });
             })}
           </View>
           <TouchableOpacity
             activeOpacity={0.82}
             disabled={savingKey === 'new-menu'}
-            style={styles.saveButton}
+            style={[
+              styles.saveButton,
+              {
+                backgroundColor: palette.buttonBackground,
+                borderColor: palette.buttonBorder,
+              },
+            ]}
             onPress={createMenu}
           >
-            <Icon name="save" size={15} color="#FFFFFF" />
-            <Text style={styles.saveButtonText}>Salvar novo menu</Text>
+            <Icon name="save" size={15} color={palette.buttonIcon} />
+            <Text style={[styles.saveButtonText, {color: palette.buttonText}]}>Salvar novo menu</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -555,35 +673,53 @@ export default function MenuAccessConfigPage() {
           <Text style={styles.centerText}>Carregando menus...</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.list}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
           {groupedItems.map(group => {
             const categoryId = getId(group.category);
             const categoryDraft = categoryDrafts[String(categoryId)] || {};
+            const categoryIcon = normalizeFeatherIcon(categoryDraft.icon) || 'folder';
 
             return (
               <View key={categoryId || group.category?.name} style={styles.categoryBlock}>
                 <View style={styles.categoryHeader}>
                   <View style={styles.categoryPreview}>
-                    <Icon name={categoryDraft.icon || 'folder'} size={18} color={categoryDraft.color} />
+                    <Icon name={categoryIcon} size={18} color={categoryDraft.color} />
                     <Text style={styles.categoryTitle}>{categoryDraft.name || group.category?.name}</Text>
                   </View>
                   <View style={styles.categoryActions}>
                     <TouchableOpacity
                       activeOpacity={0.82}
-                      style={styles.secondaryButton}
+                      style={[
+                        styles.categoryButton,
+                        {
+                          backgroundColor: palette.buttonBackground,
+                          borderColor: palette.buttonBorder,
+                        },
+                      ]}
                       onPress={() => openAddMenu(categoryId)}
                     >
-                      <Icon name="plus" size={14} color="#2563EB" />
-                      <Text style={styles.secondaryButtonText}>Adicionar</Text>
+                      <Icon name="plus" size={14} color={palette.buttonIcon} />
+                      <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Adicionar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       activeOpacity={0.82}
                       disabled={savingKey === `category-${categoryId}`}
-                      style={styles.secondaryButton}
+                      style={[
+                        styles.categoryButton,
+                        {
+                          backgroundColor: palette.buttonBackground,
+                          borderColor: palette.buttonBorder,
+                        },
+                      ]}
                       onPress={() => saveCategory(group.category)}
                     >
-                      <Icon name="save" size={14} color="#2563EB" />
-                      <Text style={styles.secondaryButtonText}>Salvar categoria</Text>
+                      <Icon name="save" size={14} color={palette.buttonIcon} />
+                      <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Salvar categoria</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -595,17 +731,26 @@ export default function MenuAccessConfigPage() {
                     onChangeText={name => setCategoryDraft(categoryId, {name})}
                     placeholder="Nome da categoria"
                   />
-                  <TextInput
-                    style={styles.compactInput}
+                  <DefaultFeatherIconPicker
+                    style={styles.categoryIconField}
                     value={categoryDraft.icon}
-                    onChangeText={icon => setCategoryDraft(categoryId, {icon})}
-                    placeholder="Icone"
+                    onChange={icon => setCategoryDraft(categoryId, {icon})}
+                    placeholder="Buscar icone"
                   />
                   <TextInput
                     style={styles.compactInput}
                     value={categoryDraft.color}
                     onChangeText={color => setCategoryDraft(categoryId, {color})}
                     placeholder="Cor"
+                  />
+                  <TextInput
+                    style={styles.orderInput}
+                    value={categoryDraft.sortOrder}
+                    keyboardType="numeric"
+                    onChangeText={sortOrder => setCategoryDraft(categoryId, {
+                      sortOrder: normalizeSortOrderValue(sortOrder),
+                    })}
+                    placeholder="Ordem"
                   />
                 </View>
 
@@ -617,7 +762,7 @@ export default function MenuAccessConfigPage() {
                     const disabled = savingKey === `menu-${item.id}`;
 
                     return (
-                      <View key={item.id} style={[styles.menuRow, !draft.enabled && styles.rowDisabled]}>
+                      <View key={item.id} style={styles.menuRow}>
                         <View style={styles.menuHeader}>
                           <View style={styles.menuPreview}>
                             <Icon name={draft.icon || 'circle'} size={17} color={draft.color} />
@@ -628,11 +773,34 @@ export default function MenuAccessConfigPage() {
                           </View>
                           <TouchableOpacity
                             activeOpacity={0.82}
-                            style={[styles.enabledButton, draft.enabled && styles.enabledButtonActive]}
+                            style={[
+                              styles.enabledButton,
+                              {
+                                backgroundColor: draft.enabled
+                                  ? palette.buttonBackground
+                                  : palette.buttonBackgroundSecondary,
+                                borderColor: draft.enabled
+                                  ? palette.buttonBorder
+                                  : palette.buttonBorderSecondary,
+                              },
+                            ]}
                             onPress={() => setMenuDraft(item.id, {enabled: !draft.enabled})}
                           >
-                            <Icon name={draft.enabled ? 'eye' : 'eye-off'} size={14} color={draft.enabled ? '#FFFFFF' : '#64748B'} />
-                            <Text style={[styles.enabledText, draft.enabled && styles.enabledTextActive]}>
+                            <Icon
+                              name={draft.enabled ? 'eye' : 'eye-off'}
+                              size={14}
+                              color={draft.enabled ? palette.buttonIcon : palette.buttonIconSecondary}
+                            />
+                            <Text
+                              style={[
+                                styles.enabledText,
+                                {
+                                  color: draft.enabled
+                                    ? palette.buttonText
+                                    : palette.buttonTextSecondary,
+                                },
+                              ]}
+                            >
                               {draft.enabled ? 'Ativo' : 'Inativo'}
                             </Text>
                           </TouchableOpacity>
@@ -659,7 +827,7 @@ export default function MenuAccessConfigPage() {
                                   const selectedRoute = routeById[String(option.id)] || option;
                                   setMenuDraft(item.id, {
                                     routeId: String(option.id),
-                                    icon: selectedRoute.icon || '',
+                                    icon: normalizeFeatherIcon(selectedRoute.icon),
                                     color: selectedRoute.color || '',
                                   });
                                 },
@@ -686,10 +854,9 @@ export default function MenuAccessConfigPage() {
                           </View>
                           <View style={styles.fieldSmall}>
                             <Text style={styles.fieldLabel}>Icone da rota</Text>
-                            <TextInput
-                              style={styles.input}
+                            <DefaultFeatherIconPicker
                               value={draft.icon}
-                              onChangeText={icon => setMenuDraft(item.id, {icon})}
+                              onChange={icon => setMenuDraft(item.id, {icon})}
                             />
                           </View>
                           <View style={styles.fieldSmall}>
@@ -715,31 +882,30 @@ export default function MenuAccessConfigPage() {
                           {availableLinkTypes.map(linkType => {
                             const selected = draft.linkTypes.includes(linkType);
 
-                            return (
-                              <TouchableOpacity
-                                key={`${item.id}-${linkType}`}
-                                activeOpacity={0.82}
-                                disabled={disabled}
-                                style={[styles.linkButton, selected && styles.linkButtonActive]}
-                                onPress={() => toggleDraftLinkType(item.id, linkType)}
-                              >
-                                <Icon name={selected ? 'check-square' : 'square'} size={14} color={selected ? '#2563EB' : '#94A3B8'} />
-                                <Text style={[styles.linkText, selected && styles.linkTextActive]}>
-                                  {linkTypeLabel(linkType)}
-                                </Text>
-                              </TouchableOpacity>
-                            );
+                            return renderLinkTypeButton({
+                              key: `${item.id}-${linkType}`,
+                              linkType,
+                              selected,
+                              disabled,
+                              onPress: () => toggleDraftLinkType(item.id, linkType),
+                            });
                           })}
                         </View>
 
                         <TouchableOpacity
                           activeOpacity={0.82}
                           disabled={disabled}
-                          style={styles.saveButton}
+                          style={[
+                            styles.saveButton,
+                            {
+                              backgroundColor: palette.buttonBackground,
+                              borderColor: palette.buttonBorder,
+                            },
+                          ]}
                           onPress={() => saveMenu(item)}
                         >
-                          <Icon name="save" size={15} color="#FFFFFF" />
-                          <Text style={styles.saveButtonText}>Salvar menu</Text>
+                          <Icon name="save" size={15} color={palette.buttonIcon} />
+                          <Text style={[styles.saveButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
                         </TouchableOpacity>
                       </View>
                     );

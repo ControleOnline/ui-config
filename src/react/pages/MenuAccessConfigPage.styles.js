@@ -209,6 +209,10 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
+  categoryIconField: {
+    minWidth: 160,
+    width: 220,
+  },
   compactInput: {
     backgroundColor: '#FFFFFF',
     borderColor: '#CBD5E1',
@@ -221,6 +225,19 @@ export default StyleSheet.create({
     minWidth: 120,
     paddingHorizontal: 10,
     paddingVertical: 8,
+  },
+  orderInput: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CBD5E1',
+    borderRadius: 8,
+    borderWidth: 1,
+    color: '#0F172A',
+    fontSize: 13,
+    fontWeight: '700',
+    minHeight: 38,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    width: 88,
   },
   selectField: {
     alignItems: 'center',
@@ -243,23 +260,16 @@ export default StyleSheet.create({
   },
   enabledButton: {
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
     borderRadius: 8,
+    borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
-  enabledButtonActive: {
-    backgroundColor: '#16A34A',
-  },
   enabledText: {
-    color: '#64748B',
     fontSize: 12,
     fontWeight: '800',
-  },
-  enabledTextActive: {
-    color: '#FFFFFF',
   },
   linkGrid: {
     flexDirection: 'row',
@@ -268,8 +278,6 @@ export default StyleSheet.create({
   },
   linkButton: {
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderColor: '#E2E8F0',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -277,36 +285,25 @@ export default StyleSheet.create({
     minHeight: 34,
     paddingHorizontal: 10,
   },
-  linkButtonActive: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#93C5FD',
-  },
   linkText: {
-    color: '#64748B',
     fontSize: 12,
     fontWeight: '700',
   },
-  linkTextActive: {
-    color: '#1D4ED8',
-  },
   primaryButton: {
     alignItems: 'center',
-    backgroundColor: '#2563EB',
     borderRadius: 8,
+    borderWidth: 1,
     flexDirection: 'row',
     gap: 7,
     minHeight: 38,
     paddingHorizontal: 12,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '800',
   },
-  secondaryButton: {
+  categoryButton: {
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -314,23 +311,21 @@ export default StyleSheet.create({
     minHeight: 34,
     paddingHorizontal: 10,
   },
-  secondaryButtonText: {
-    color: '#2563EB',
+  categoryButtonText: {
     fontSize: 12,
     fontWeight: '800',
   },
   saveButton: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#0F766E',
     borderRadius: 8,
+    borderWidth: 1,
     flexDirection: 'row',
     gap: 7,
     minHeight: 36,
     paddingHorizontal: 12,
   },
   saveButtonText: {
-    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '800',
   },
@@ -434,6 +429,10 @@ export default StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 9,
+  },
+  optionTextGroup: {
+    flex: 1,
+    minWidth: 0,
   },
   optionRowActive: {
     backgroundColor: '#EFF6FF',
