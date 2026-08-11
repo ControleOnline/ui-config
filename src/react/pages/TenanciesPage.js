@@ -8,6 +8,7 @@ import { useMessage } from '@controleonline/ui-common/src/react/components/Messa
 import DefaultTable from '@controleonline/ui-default/src/react/components/table/DefaultTable';
 import { userHasRole } from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import styles from './TenanciesPage.styles';
+import { TENANCIES_I18N, tTenancy } from '../utils/tenanciesI18n';
 
 const EMPTY_FORM = {
   id: '',
@@ -48,7 +49,7 @@ export default function TenanciesPage({ navigation }) {
   const canManage = app_type_base === 'ADMIN' && userHasRole(authGetters.user, 'ROLE_SUPER');
 
   useEffect(() => {
-    navigation?.setOptions?.({ title: 'Tenancies' });
+    navigation?.setOptions?.({ title: tTenancy(TENANCIES_I18N.pageTitle) });
   }, [navigation]);
 
   const openNew = useCallback(() => {
@@ -67,18 +68,18 @@ export default function TenanciesPage({ navigation }) {
     try {
       const saved = await actions.save(form);
       setForm(normalizeFormFromItem(saved));
-      showSuccess('Tenancy salva.');
+      showSuccess(tTenancy(TENANCIES_I18N.saveSuccess));
     } catch (saveError) {
-      showError(saveError?.message || 'Falha ao salvar tenancy.');
+      showError(saveError?.message || tTenancy(TENANCIES_I18N.saveError));
     }
   }, [actions, form, showError, showSuccess]);
 
   const enqueueInstall = useCallback(async item => {
     try {
       await actions.enqueueInstall(item);
-      showSuccess('Instalação reenfileirada.');
+      showSuccess(tTenancy(TENANCIES_I18N.installSuccess));
     } catch (installError) {
-      showError(installError?.message || 'Falha ao reenfileirar instalação.');
+      showError(tTenancy(TENANCIES_I18N.installError));
     }
   }, [actions, showError, showSuccess]);
 
@@ -86,8 +87,8 @@ export default function TenanciesPage({ navigation }) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.panel}>
-          <Text style={styles.title}>Acesso restrito</Text>
-          <Text style={styles.meta}>Tenancies ficam disponíveis apenas no app ADMIN para ROLE_SUPER.</Text>
+          <Text style={styles.title}>{tTenancy(TENANCIES_I18N.restrictedTitle)}</Text>
+          <Text style={styles.meta}>{tTenancy(TENANCIES_I18N.restrictedMeta)}</Text>
         </View>
       </SafeAreaView>
     );
@@ -97,7 +98,7 @@ export default function TenanciesPage({ navigation }) {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Tenancies</Text>
+          <Text style={styles.title}>{tTenancy(TENANCIES_I18N.pageTitle)}</Text>
           <TouchableOpacity style={styles.iconButton} onPress={openNew}>
             <Icon name="plus" size={18} color="#0284C7" />
           </TouchableOpacity>
@@ -106,39 +107,39 @@ export default function TenanciesPage({ navigation }) {
         <View style={styles.panel}>
           <View style={styles.grid}>
             <View style={styles.field}>
-              <Text style={styles.label}>Domínio</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.domain)}</Text>
               <TextInput style={styles.input} value={form.appHost} onChangeText={value => updateField('appHost', value)} autoCapitalize="none" />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>DB host</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.dbHost)}</Text>
               <TextInput style={styles.input} value={form.dbHost} onChangeText={value => updateField('dbHost', value)} autoCapitalize="none" />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>DB name</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.dbName)}</Text>
               <TextInput style={styles.input} value={form.dbName} onChangeText={value => updateField('dbName', value)} autoCapitalize="none" />
             </View>
             <View style={[styles.field, styles.fieldSmall]}>
-              <Text style={styles.label}>Porta</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.port)}</Text>
               <TextInput style={styles.input} value={form.dbPort} onChangeText={value => updateField('dbPort', value)} keyboardType="number-pad" />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>DB user</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.dbUser)}</Text>
               <TextInput style={styles.input} value={form.dbUser} onChangeText={value => updateField('dbUser', value)} autoCapitalize="none" />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>Senha</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.password)}</Text>
               <TextInput style={styles.input} value={form.dbPassword} onChangeText={value => updateField('dbPassword', value)} secureTextEntry />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>Driver</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.driver)}</Text>
               <TextInput style={styles.input} value={form.dbDriver} onChangeText={value => updateField('dbDriver', value)} autoCapitalize="none" />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>Instância</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.instance)}</Text>
               <TextInput style={styles.input} value={form.dbInstance} onChangeText={value => updateField('dbInstance', value)} autoCapitalize="none" />
             </View>
             <View style={styles.field}>
-              <Text style={styles.label}>Status</Text>
+              <Text style={styles.label}>{tTenancy(TENANCIES_I18N.status)}</Text>
               <TextInput style={styles.input} value={form.installationStatus} onChangeText={value => updateField('installationStatus', value)} autoCapitalize="none" />
             </View>
           </View>
@@ -146,11 +147,11 @@ export default function TenanciesPage({ navigation }) {
           <View style={styles.actions}>
             <TouchableOpacity style={styles.secondaryButton} onPress={openNew}>
               <Icon name="plus" size={14} color="#0F172A" />
-              <Text style={styles.secondaryButtonText}>Novo</Text>
+              <Text style={styles.secondaryButtonText}>{tTenancy(TENANCIES_I18N.new)}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.primaryButton} onPress={save} disabled={isSaving}>
               <Icon name="save" size={14} color="#FFFFFF" />
-              <Text style={styles.buttonText}>{isSaving ? 'Salvando...' : 'Salvar'}</Text>
+              <Text style={styles.buttonText}>{isSaving ? tTenancy(TENANCIES_I18N.saving) : tTenancy(TENANCIES_I18N.save)}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -167,18 +168,18 @@ export default function TenanciesPage({ navigation }) {
             rowActionsComponent={({ row }) => (
               <TouchableOpacity style={styles.secondaryButton} onPress={() => enqueueInstall(row)}>
                 <Icon name="play" size={14} color="#0F172A" />
-                <Text style={styles.secondaryButtonText}>Instalar</Text>
+                <Text style={styles.secondaryButtonText}>{tTenancy(TENANCIES_I18N.install)}</Text>
               </TouchableOpacity>
             )}
             searchProps={{
               compact: true,
-              placeholder: 'Buscar domínio, banco, usuário ou status',
+              placeholder: tTenancy(TENANCIES_I18N.searchPlaceholder),
               searchKey: 'search',
               storeName: 'tenancies',
             }}
             showRowActions
             storeName="tenancies"
-            totalItemsLabel="tenancies"
+            totalItemsLabel={tTenancy(TENANCIES_I18N.totalItems)}
             visibleColumnsPreferenceKey="tenancies"
           />
         </View>
