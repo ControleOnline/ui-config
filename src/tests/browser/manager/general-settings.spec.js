@@ -65,6 +65,7 @@ const mockGeneralSettingsApi = async (page, {activeTab = 'maps'} = {}) => {
   const companyConfigs = {
     'web-google-maps-api-key': 'saved-web-key',
     'android-google-maps-api-key': '',
+    'shop-franchise-address-category-ids': '[]',
   };
   const privateConfigs = {};
   const company = createCompany(companyConfigs);
@@ -155,6 +156,20 @@ const mockGeneralSettingsApi = async (page, {activeTab = 'maps'} = {}) => {
           configKey,
           configValue,
         })))),
+      });
+    }
+
+    if (pathname === 'categories' && method === 'GET') {
+      expect(url.searchParams.get('context')).toBe('shop-franchise-address');
+      expect(url.searchParams.get('people')).toBe('/people/3');
+
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection([
+          {id: 81, name: 'Mapa de franquias'},
+          {id: 82, name: 'Retirada no local'},
+        ])),
       });
     }
 
@@ -257,6 +272,7 @@ test.describe('general settings browser smoke', () => {
     await page.goto('/general-settings');
 
     await expect(page.getByPlaceholder('Cole a chave do Google Maps para web')).toBeVisible();
+    await expect(page.getByText('Mapa de franquias')).toBeVisible();
     await expect(page.getByRole('button', {name: /^Salvar/})).toHaveCount(0);
 
     await page.getByPlaceholder('Cole a chave do Google Maps para web').fill(
@@ -282,5 +298,12 @@ test.describe('general settings browser smoke', () => {
     expect(api.companyConfigs['web-google-maps-api-key']).toBe(
       'https://maps.example.com/api-key',
     );
+
+    await page.getByText('Mapa de franquias').click();
+    await expect.poll(() => api.savedConfigRequests.length).toBe(2);
+    expect(JSON.stringify(api.savedConfigRequests[1])).toContain(
+      'shop-franchise-address-category-ids',
+    );
+    expect(JSON.stringify(api.savedConfigRequests[1])).toContain('81');
   });
 });
