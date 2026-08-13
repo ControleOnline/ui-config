@@ -57,11 +57,63 @@ const normalizeConfigValue = value => {
   return value;
 };
 
+/**
+ * Mixed domain payload used by the Shop tab smoke.
+ * API may return non-SHOP rows; client filter must keep only SHOP.
+ */
+const MIXED_PEOPLE_DOMAINS = [
+  {
+    id: 101,
+    '@id': '/people_domains/101',
+    domain: 'shop.example.com',
+    domainType: 'SHOP',
+    people: '/people/3',
+  },
+  {
+    id: 102,
+    '@id': '/people_domains/102',
+    domain: 'crm.example.com',
+    domainType: 'CRM',
+    people: '/people/3',
+  },
+  {
+    id: 103,
+    '@id': '/people_domains/103',
+    domain: 'manager.example.com',
+    domainType: 'MANAGER',
+    people: '/people/3',
+  },
+  {
+    id: 104,
+    '@id': '/people_domains/104',
+    domain: 'pos.example.com',
+    domainType: 'POS',
+    people: '/people/3',
+  },
+];
+
+const PRODUCT_SHOWCASES = [
+  {
+    id: 201,
+    '@id': '/product_showcases/201',
+    name: 'Vitrine Shop',
+    integrationKey: 'shop',
+    active: true,
+    peopleDomain: '/people_domains/101',
+    company: '/people/3',
+    settings: {},
+  },
+];
+
 /*
  * @agents This smoke keeps the settings screen on the selected tab after refresh
  * and verifies text inputs persist through blur without a save button.
+ * Also covers Shop tab listing only domainType=SHOP domains (#359).
  */
-const mockGeneralSettingsApi = async (page, {activeTab = 'maps'} = {}) => {
+const mockGeneralSettingsApi = async (
+  page,
+  {activeTab = 'maps', peopleDomains = []} = {},
+) => {
   const companyConfigs = {
     'web-google-maps-api-key': 'saved-web-key',
     'android-google-maps-api-key': '',
@@ -150,11 +202,17 @@ const mockGeneralSettingsApi = async (page, {activeTab = 'maps'} = {}) => {
       return route.fulfill({
         status: 200,
         headers: jsonHeaders(),
-        body: JSON.stringify(collection(Object.entries(privateConfigs).map(([configKey, configValue], index) => ({
-          id: index + 1,
-          configKey,
-          configValue,
-        })))),
+        body: JSON.stringify(
+          collection(
+            Object.entries(privateConfigs).map(
+              ([configKey, configValue], index) => ({
+                id: index + 1,
+                configKey,
+                configValue,
+              }),
+            ),
+          ),
+        ),
       });
     }
 
@@ -170,6 +228,30 @@ const mockGeneralSettingsApi = async (page, {activeTab = 'maps'} = {}) => {
         status: 200,
         headers: jsonHeaders(),
         body: JSON.stringify({}),
+      });
+    }
+
+    // people_domains — Shop tab loads with domainType=SHOP query;
+    // still return the configured list so the client-side filter can be proven.
+    if (
+      pathname === 'people_domains' ||
+      pathname.startsWith('people_domains')
+    ) {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection(peopleDomains)),
+      });
+    }
+
+    if (
+      pathname === 'product_showcases' ||
+      pathname.startsWith('product_showcases')
+    ) {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection(PRODUCT_SHOWCASES)),
       });
     }
 
@@ -239,16 +321,24 @@ test.describe('general settings browser smoke', () => {
     await page.goto('/general-settings');
 
     await expect(
-      page.getByPlaceholder('1234567890-abc123def456.apps.googleusercontent.com'),
+      page.getByPlaceholder(
+        '1234567890-abc123def456.apps.googleusercontent.com',
+      ),
     ).toBeVisible();
-    await expect(page.getByPlaceholder('Cole a chave do Google Maps para web')).toHaveCount(0);
+    await expect(
+      page.getByPlaceholder('Cole a chave do Google Maps para web'),
+    ).toHaveCount(0);
 
     await page.reload({waitUntil: 'domcontentloaded'});
 
     await expect(
-      page.getByPlaceholder('1234567890-abc123def456.apps.googleusercontent.com'),
+      page.getByPlaceholder(
+        '1234567890-abc123def456.apps.googleusercontent.com',
+      ),
     ).toBeVisible();
-    await expect(page.getByPlaceholder('Cole a chave do Google Maps para web')).toHaveCount(0);
+    await expect(
+      page.getByPlaceholder('Cole a chave do Google Maps para web'),
+    ).toHaveCount(0);
   });
 
   test('saves map settings on blur without a save button', async ({page}) => {
@@ -256,12 +346,14 @@ test.describe('general settings browser smoke', () => {
 
     await page.goto('/general-settings');
 
-    await expect(page.getByPlaceholder('Cole a chave do Google Maps para web')).toBeVisible();
+    await expect(
+      page.getByPlaceholder('Cole a chave do Google Maps para web'),
+    ).toBeVisible();
     await expect(page.getByRole('button', {name: /^Salvar/})).toHaveCount(0);
 
-    await page.getByPlaceholder('Cole a chave do Google Maps para web').fill(
-      'https://maps.example.com/api-key',
-    );
+    await page
+      .getByPlaceholder('Cole a chave do Google Maps para web')
+      .fill('https://maps.example.com/api-key');
 
     const saveRequestPromise = page.waitForRequest(request => {
       return (
@@ -282,5 +374,28 @@ test.describe('general settings browser smoke', () => {
     expect(api.companyConfigs['web-google-maps-api-key']).toBe(
       'https://maps.example.com/api-key',
     );
+  });
+
+  /*
+   * Acceptance (#359): aba Shop lista somente domínios domainType=SHOP.
+   * Mock returns mixed types; UI must show only the SHOP domain name.
+   */
+  test('shop tab lists only domainType SHOP domains', async ({page}) => {
+    await mockGeneralSettingsApi(page, {
+      activeTab: 'shop',
+      peopleDomains: MIXED_PEOPLE_DOMAINS,
+    });
+
+    await page.goto('/general-settings');
+
+    // SHOP domain tab must be visible
+    await expect(page.getByText('shop.example.com')).toBeVisible({
+      timeout: 15000,
+    });
+
+    // Non-SHOP domains must not appear in the Shop tab list
+    await expect(page.getByText('crm.example.com')).toHaveCount(0);
+    await expect(page.getByText('manager.example.com')).toHaveCount(0);
+    await expect(page.getByText('pos.example.com')).toHaveCount(0);
   });
 });
