@@ -19,7 +19,7 @@ import {userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
 import styles from './MenuAccessConfigPage.styles';
 
-const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE'];
+const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE', 'MKT'];
 const LINK_TYPES = ['owner', 'director', 'manager', 'employee', 'salesman', 'after-sales'];
 
 const formatApiError = error => {
