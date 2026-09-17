@@ -23,7 +23,7 @@ export default function CronJobsPage() {
   const authStore = useStore('auth');
   const cronJobsStore = useStore('cron_jobs');
 
-  const { currentCompany, mainCompany } = peopleStore.getters || {};
+  const { mainCompany } = peopleStore.getters || {};
   const { user } = authStore.getters || {};
   const { colors: themeColors } = themeStore.getters || {};
   const storeError = cronJobsStore?.getters?.error || '';
@@ -33,8 +33,6 @@ export default function CronJobsPage() {
 
   const isAdminApp = app_type_base === 'ADMIN';
   const canManageCronJobs = isAdminApp && userHasRole(user, 'ROLE_SUPER');
-  const mainCompany = mainCompany || currentCompany || null;
-
   const palette = useMemo(
     () =>
       resolveThemePalette(
