@@ -17,12 +17,14 @@ export default function CronJobsPage() {
   const themeStore = useStore('theme');
   const authStore = useStore('auth');
 
-  const { mainCompany } = peopleStore.getters || {};
+  const { currentCompany, defaultCompany } = peopleStore.getters || {};
   const { user } = authStore.getters || {};
   const { colors: themeColors } = themeStore.getters || {};
 
   const isAdminApp = app_type_base === 'ADMIN';
   const canManageCronJobs = isAdminApp && userHasRole(user, 'ROLE_SUPER');
+  const mainCompany = defaultCompany || currentCompany || null;
+
   const palette = useMemo(
     () =>
       resolveThemePalette(
