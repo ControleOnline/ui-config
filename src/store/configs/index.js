@@ -20,7 +20,7 @@ items:[],
     company: null,
     item: {},
     currentCompany: null,
-    mainCompany: null,
+    defaultCompany: null,
     companies: [],
 
     columns: [
