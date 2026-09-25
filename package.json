@@ -1,5 +1,5 @@
 {
-  "name": "@controleonline/ui-legacy/quasar-config-ui",
+  "name": "@controleonline/ui-config",
   "version": "1.0.24",
   "author": "ControleOnline",
   "description": "ControleOnline Docs Quasar UI Component",
@@ -8,7 +8,7 @@
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/ControleOnline/conline-quasar-ui"
+    "url": "https://github.com/ControleOnline/ui-config"
   },
   "bugs": "",
   "homepage": "https://www.controleonline.com/devs/plugins",
