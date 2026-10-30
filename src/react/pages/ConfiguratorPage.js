@@ -94,7 +94,7 @@ const getConfigActions = () => [
 
 function ActionCard({ styles, colors, label, description, icon, onPress }) {
   return (
-    <TouchableOpacity style={styles.actionCard} activeOpacity={0.9} onPress={onPress}>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} style={styles.actionCard} activeOpacity={0.9} onPress={onPress}>
       <View style={styles.actionHeader}>
         <View style={[styles.actionIconWrap, { backgroundColor: colors.cardIconBackground }]}>
           <Icon name={icon} size={18} color={colors.cardIconColor} />
@@ -114,21 +114,24 @@ export default function ConfiguratorPage({ navigation }) {
 
   const palette = useMemo(
     () =>
-      resolveThemePalette({
+      presentation?.palette || resolveThemePalette({
         ...themeColors,
         ...(currentCompany?.theme?.colors || {}),
       }),
-    [themeColors, currentCompany?.id],
+    [presentation?.palette, themeColors, currentCompany?.id],
   );
   const configuratorColors = useMemo(
     () => resolveConfiguratorColors(palette),
     [palette],
   );
   const styles = useMemo(
-    () => createStyles(configuratorColors),
-    [configuratorColors],
+    () => presentation?.styles || createStyles(configuratorColors),
+    [presentation?.styles, configuratorColors],
   );
-  const configActions = getConfigActions();
+  const configActions = getConfigActions().map(item => ({
+    ...item,
+    ...(presentation?.actionText?.[item.route] || {}),
+  }));
 
   return (
     <SafeAreaView
@@ -140,7 +143,7 @@ export default function ConfiguratorPage({ navigation }) {
             <Icon name="sliders" size={22} color={configuratorColors.cardIconColor} />
           </View>
           <Text style={styles.heroEyebrow}>{tt('hub_eyebrow', 'configurator') || 'CONFIGURADOR'}</Text>
-          <Text style={styles.heroTitle}>{tt('hub_title', 'configurationCenter') || 'Central de configuração'}</Text>
+          <Text style={styles.heroTitle}>{presentation?.text?.title || tt('hub_title', 'configurationCenter') || 'Central de configuração'}</Text>
           <Text style={styles.heroText}>
             {tt('hub_text', 'configurationCenter') ||
               'Agrupe conexões, integrações e configurações gerais em um único lugar e deixe a home focada no que realmente precisa aparecer nela.'}
