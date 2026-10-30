@@ -3,7 +3,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useStore } from '@store';
-import { resolveThemePalette } from '@controleonline/../../src/styles/branding';
+import { resolveThemePalette } from '@controleonline/ui-layout/src/styles/branding';
 import { createStyles } from './ConfiguratorPage.styles';
 
 const tt = (type, key) => global.t?.t('configs', type, key);
@@ -106,7 +106,7 @@ function ActionCard({ styles, colors, label, description, icon, onPress }) {
   );
 }
 
-export default function ConfiguratorPage({ navigation, presentation = null }) {
+export default function ConfiguratorPage({ navigation }) {
   const peopleStore = useStore('people');
   const themeStore = useStore('theme');
   const { currentCompany } = peopleStore.getters;
@@ -145,14 +145,14 @@ export default function ConfiguratorPage({ navigation, presentation = null }) {
           <Text style={styles.heroEyebrow}>{tt('hub_eyebrow', 'configurator') || 'CONFIGURADOR'}</Text>
           <Text style={styles.heroTitle}>{presentation?.text?.title || tt('hub_title', 'configurationCenter') || 'Central de configuração'}</Text>
           <Text style={styles.heroText}>
-            {presentation?.text?.description || tt('hub_text', 'configurationCenter') ||
+            {tt('hub_text', 'configurationCenter') ||
               'Agrupe conexões, integrações e configurações gerais em um único lugar e deixe a home focada no que realmente precisa aparecer nela.'}
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>{presentation?.text?.sectionTitle || tt('hub_title', 'configuratorAccess') || 'Acessos do configurador'}</Text>
+        <Text style={styles.sectionTitle}>{tt('hub_title', 'configuratorAccess') || 'Acessos do configurador'}</Text>
         <Text style={styles.sectionDescription}>
-          {presentation?.text?.sectionDescription || tt('hub_text', 'configuratorAccess') ||
+          {tt('hub_text', 'configuratorAccess') ||
             'Conexões e integrações deixam de competir por destaque na home e passam a viver dentro deste módulo.'}
         </Text>
 
