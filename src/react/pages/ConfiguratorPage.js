@@ -3,7 +3,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useStore } from '@store';
-import { resolveThemePalette } from '@controleonline/../../src/styles/branding';
+import { resolveThemePalette } from '@controleonline/ui-layout/src/styles/branding';
 import { createStyles } from './ConfiguratorPage.styles';
 
 const tt = (type, key) => global.t?.t('configs', type, key);
