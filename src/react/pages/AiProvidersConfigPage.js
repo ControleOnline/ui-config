@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useStore } from '@store';
-import { getAPI } from '@controleonline/ui-common/src/utils/api';
+import { api } from '@controleonline/ui-common/src/api';
 
 const PROVIDER_ORDER = ['grok', 'openai', 'gemini', 'claude'];
 
@@ -41,8 +41,7 @@ export default function AiProvidersConfigPage() {
     setLoading(true);
     setError('');
     try {
-      const api = getAPI();
-      const data = await api.fetch(`mcp/chat/config?company_id=${companyId}`, null, 'GET');
+      const data = await api.get(`mcp/chat/config?company_id=${companyId}`);
       const incoming = data?.providers || {};
       const next = emptyProviders();
       PROVIDER_ORDER.forEach(key => {
@@ -81,7 +80,6 @@ export default function AiProvidersConfigPage() {
     setError('');
     setOkMsg('');
     try {
-      const api = getAPI();
       const body = { company_id: companyId, providers: {} };
       PROVIDER_ORDER.forEach(key => {
         const p = providers[key];
@@ -93,7 +91,7 @@ export default function AiProvidersConfigPage() {
           api_key: p.api_key || '',
         };
       });
-      await api.fetch('mcp/chat/config', body, 'PUT');
+      await api.put('mcp/chat/config', body);
       setOkMsg('Providers salvos na config da empresa (configKey=ai-providers).');
       await load();
     } catch (e) {
