@@ -771,6 +771,7 @@ export default function MenuAccessConfigPage() {
                               <Text style={styles.menuMeta}>{route.route || '-'} em {category.name || '-'}</Text>
                             </View>
                           </View>
+                          <View style={styles.menuHeaderActions}>
                           <TouchableOpacity
                             activeOpacity={0.82}
                             style={[
@@ -804,6 +805,22 @@ export default function MenuAccessConfigPage() {
                               {draft.enabled ? 'Ativo' : 'Inativo'}
                             </Text>
                           </TouchableOpacity>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            disabled={disabled}
+                            style={[
+                              styles.categoryButton,
+                              {
+                                backgroundColor: palette.buttonBackground,
+                                borderColor: palette.buttonBorder,
+                              },
+                            ]}
+                            onPress={() => saveMenu(item)}
+                          >
+                            <Icon name="save" size={14} color={palette.buttonIcon} />
+                            <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
+                          </TouchableOpacity>
+                          </View>
                         </View>
 
                         <View style={styles.formGrid}>
@@ -892,21 +909,6 @@ export default function MenuAccessConfigPage() {
                           })}
                         </View>
 
-                        <TouchableOpacity
-                          activeOpacity={0.82}
-                          disabled={disabled}
-                          style={[
-                            styles.saveButton,
-                            {
-                              backgroundColor: palette.buttonBackground,
-                              borderColor: palette.buttonBorder,
-                            },
-                          ]}
-                          onPress={() => saveMenu(item)}
-                        >
-                          <Icon name="save" size={15} color={palette.buttonIcon} />
-                          <Text style={[styles.saveButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
-                        </TouchableOpacity>
                       </View>
                     );
                   })}

@@ -152,6 +152,14 @@ export default StyleSheet.create({
     gap: 12,
     justifyContent: 'space-between',
   },
+  // Enabled toggle and Save menu share the header's right side (#1467).
+  menuHeaderActions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'flex-end',
+  },
   menuPreview: {
     alignItems: 'center',
     flex: 1,
