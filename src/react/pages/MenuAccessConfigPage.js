@@ -133,9 +133,9 @@ export default function MenuAccessConfigPage() {
   const themeStore = useStore('theme');
   const {user} = authStore.getters;
   const {colors: themeColors = {}} = themeStore.getters || {};
-  const {showError, showSuccess, showInfo} = useToastMessage();
-  // Delete is not available yet: the trash buttons only announce it (#1470).
-  const announceDeleteUnavailable = () => showInfo(DELETE_UNAVAILABLE_MESSAGE);
+  const {showError, showSuccess} = useToastMessage();
+  // Delete is not available yet: the trash buttons only announce it, as a negative (red) toast (#1470).
+  const announceDeleteUnavailable = () => showError(DELETE_UNAVAILABLE_MESSAGE);
 
   const [activeAppType, setActiveAppType] = useState(isAdminApp ? 'ADMIN' : 'MANAGER');
   const [items, setItems] = useState([]);
