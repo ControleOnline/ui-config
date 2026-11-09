@@ -133,9 +133,18 @@ export default function MenuAccessConfigPage() {
   const themeStore = useStore('theme');
   const {user} = authStore.getters;
   const {colors: themeColors = {}} = themeStore.getters || {};
-  const {showError, showSuccess} = useToastMessage();
-  // Delete is not available yet: the trash buttons only announce it, as a negative (red) toast (#1470).
-  const announceDeleteUnavailable = () => showError(DELETE_UNAVAILABLE_MESSAGE);
+  const {showError, showSuccess, showInfo} = useToastMessage();
+  // Delete is not available yet: the trash buttons only announce it. The toast uses the
+  // theme's `negative` color, never a hard-coded red (#1470).
+  const announceDeleteUnavailable = () => {
+    const negative = themeColors.negative;
+    showInfo(DELETE_UNAVAILABLE_MESSAGE, negative ? {
+      styles: {
+        pressable: {borderColor: negative, borderWidth: 1},
+        indicator: {backgroundColor: negative},
+      },
+    } : undefined);
+  };
 
   const [activeAppType, setActiveAppType] = useState(isAdminApp ? 'ADMIN' : 'MANAGER');
   const [items, setItems] = useState([]);
@@ -169,6 +178,7 @@ export default function MenuAccessConfigPage() {
     buttonIconSecondary: themeColors.buttonIconSecondary,
     buttonText: themeColors.buttonText,
     buttonTextSecondary: themeColors.buttonTextSecondary,
+    negative: themeColors.negative,
   }), [themeColors]);
 
   const handleScroll = useCallback(event => {
@@ -809,10 +819,10 @@ export default function MenuAccessConfigPage() {
                     activeOpacity={0.82}
                     accessibilityRole="button"
                     accessibilityLabel="Apagar categoria"
-                    style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                    style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
                     onPress={announceDeleteUnavailable}
                   >
-                    <Icon name="trash-2" size={14} color={palette.buttonIcon} />
+                    <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
                   </TouchableOpacity>
                 </View>
 
@@ -977,10 +987,10 @@ export default function MenuAccessConfigPage() {
                             activeOpacity={0.82}
                             accessibilityRole="button"
                             accessibilityLabel="Apagar item de menu"
-                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
                             onPress={announceDeleteUnavailable}
                           >
-                            <Icon name="trash-2" size={14} color={palette.buttonIcon} />
+                            <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
                           </TouchableOpacity>
                         </View>
                       </View>
