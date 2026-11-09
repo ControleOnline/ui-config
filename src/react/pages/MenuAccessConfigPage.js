@@ -38,6 +38,8 @@ const getId = value => {
   return String(value).replace(/\D/g, '');
 };
 
+const DELETE_UNAVAILABLE_MESSAGE = 'Esta funcionalidade ainda está sendo elaborada, tente mais tarde…';
+
 const indexById = items =>
   Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
 
@@ -131,7 +133,9 @@ export default function MenuAccessConfigPage() {
   const themeStore = useStore('theme');
   const {user} = authStore.getters;
   const {colors: themeColors = {}} = themeStore.getters || {};
-  const {showError, showSuccess} = useToastMessage();
+  const {showError, showSuccess, showInfo} = useToastMessage();
+  // Delete is not available yet: the trash buttons only announce it (#1470).
+  const announceDeleteUnavailable = () => showInfo(DELETE_UNAVAILABLE_MESSAGE);
 
   const [activeAppType, setActiveAppType] = useState(isAdminApp ? 'ADMIN' : 'MANAGER');
   const [items, setItems] = useState([]);
@@ -801,6 +805,15 @@ export default function MenuAccessConfigPage() {
                     })}
                     placeholder="Ordem"
                   />
+                  <TouchableOpacity
+                    activeOpacity={0.82}
+                    accessibilityRole="button"
+                    accessibilityLabel="Apagar categoria"
+                    style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                    onPress={announceDeleteUnavailable}
+                  >
+                    <Icon name="trash-2" size={14} color={palette.buttonIcon} />
+                  </TouchableOpacity>
                 </View>
 
                 {expanded ? (
@@ -959,6 +972,17 @@ export default function MenuAccessConfigPage() {
                           })}
                         </View>
 
+                        <View style={styles.menuFooter}>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            accessibilityLabel="Apagar item de menu"
+                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            onPress={announceDeleteUnavailable}
+                          >
+                            <Icon name="trash-2" size={14} color={palette.buttonIcon} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     );
                   })}

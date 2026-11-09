@@ -310,6 +310,16 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
   },
+  // Trash buttons sit at the bottom-right of the category header and of each item (#1470).
+  trashButton: {
+    justifyContent: 'center',
+    marginLeft: 'auto',
+    minWidth: 34,
+    paddingHorizontal: 0,
+  },
+  menuFooter: {
+    alignItems: 'flex-end',
+  },
   collapseButton: {
     alignItems: 'center',
     height: 32,
