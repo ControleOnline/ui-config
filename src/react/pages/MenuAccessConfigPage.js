@@ -18,6 +18,7 @@ import {app_type_base} from '@appType';
 import {userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
 import styles from './MenuAccessConfigPage.styles';
+import {renumberByTen} from '../utils/menuOrder';
 
 const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE'];
 const LINK_TYPES = ['owner', 'director', 'manager', 'employee', 'salesman', 'after-sales'];
@@ -357,6 +358,37 @@ export default function MenuAccessConfigPage() {
     </TouchableOpacity>
   );
 
+  // After an order is saved, the affected level is re-spaced as 10,20,30... (#1468).
+  const patchSortOrders = async (changes, pathFor) => {
+    for (const change of changes) {
+      await api.fetch(pathFor(change.id), {method: 'PATCH', body: {sortOrder: change.sortOrder}});
+    }
+  };
+
+  const renumberMenusAfterSave = async (item, draft) => {
+    const newCategoryId = String(draft.categoryId || getId(item.category) || '');
+    const oldCategoryId = String(getId(item.category) || '');
+    for (const categoryId of new Set([newCategoryId, oldCategoryId])) {
+      if (!categoryId) continue;
+      const entries = items
+        .filter(other => String(other.id) !== String(item.id) && String(getId(other.category) || '') === categoryId)
+        .map(other => ({id: other.id, sortOrder: other.sortOrder ?? other.sort_order}));
+      const isTarget = categoryId === newCategoryId;
+      if (isTarget) entries.push({id: item.id, sortOrder: Number(draft.sortOrder || 0)});
+      await patchSortOrders(renumberByTen(entries, isTarget ? item.id : null), id => `menu-config/${id}`);
+    }
+  };
+
+  const renumberCategoriesAfterSave = async (categoryId, draft) => {
+    const entries = availableCategories.map(category => ({
+      id: getId(category),
+      sortOrder: String(getId(category)) === String(categoryId)
+        ? (draft.sortOrder === '' ? null : Number(draft.sortOrder || 0))
+        : category.sortOrder ?? category.sort_order,
+    }));
+    await patchSortOrders(renumberByTen(entries, categoryId), id => `menu-config/categories/${id}`);
+  };
+
   const saveMenu = async item => {
     const draft = menuDrafts[String(item.id)] || toDraft(item);
     setSavingKey(`menu-${item.id}`);
@@ -374,6 +406,7 @@ export default function MenuAccessConfigPage() {
           linkTypes: draft.linkTypes,
         },
       });
+      await renumberMenusAfterSave(item, draft);
       showSuccess('Menu atualizado.');
       await loadMenus({preserveScroll: true});
     } catch (error) {
@@ -396,6 +429,7 @@ export default function MenuAccessConfigPage() {
           sortOrder: draft.sortOrder === '' ? null : Number(draft.sortOrder || 0),
         },
       });
+      await renumberCategoriesAfterSave(categoryId, draft);
       showSuccess('Categoria atualizada.');
       await loadMenus({preserveScroll: true});
     } catch (error) {
