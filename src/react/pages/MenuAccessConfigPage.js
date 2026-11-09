@@ -146,6 +146,10 @@ export default function MenuAccessConfigPage() {
   const [categoryDrafts, setCategoryDrafts] = useState({});
   const [picker, setPicker] = useState(null);
   const [addDraft, setAddDraft] = useState(null);
+  // Categories start collapsed; the set holds the ids of the expanded ones (#1469).
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const toggleCategory = categoryId =>
+    setExpandedCategories(current => ({...current, [String(categoryId)]: !current[String(categoryId)]}));
   const scrollViewRef = useRef(null);
   const scrollOffsetRef = useRef(0);
 
@@ -716,12 +720,23 @@ export default function MenuAccessConfigPage() {
           {groupedItems.map(group => {
             const categoryId = getId(group.category);
             const categoryDraft = categoryDrafts[String(categoryId)] || {};
+            const expanded = Boolean(expandedCategories[String(categoryId)]);
             const categoryIcon = normalizeFeatherIcon(categoryDraft.icon) || 'folder';
 
             return (
               <View key={categoryId || group.category?.name} style={styles.categoryBlock}>
                 <View style={styles.categoryHeader}>
                   <View style={styles.categoryPreview}>
+                    <TouchableOpacity
+                      activeOpacity={0.82}
+                      accessibilityRole="button"
+                      accessibilityLabel={expanded ? 'Recolher categoria' : 'Expandir categoria'}
+                      accessibilityState={{expanded}}
+                      style={styles.collapseButton}
+                      onPress={() => toggleCategory(categoryId)}
+                    >
+                      <Icon name={expanded ? 'chevron-down' : 'chevron-right'} size={18} color={palette.buttonIcon} />
+                    </TouchableOpacity>
                     <Icon name={categoryIcon} size={18} color={categoryDraft.color} />
                     <Text style={styles.categoryTitle}>{categoryDraft.name || group.category?.name}</Text>
                   </View>
@@ -788,6 +803,7 @@ export default function MenuAccessConfigPage() {
                   />
                 </View>
 
+                {expanded ? (
                 <View style={styles.menuList}>
                   {group.menus.map(item => {
                     const draft = menuDrafts[String(item.id)] || toDraft(item);
@@ -947,6 +963,7 @@ export default function MenuAccessConfigPage() {
                     );
                   })}
                 </View>
+                ) : null}
               </View>
             );
           })}

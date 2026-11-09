@@ -310,6 +310,12 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
   },
+  collapseButton: {
+    alignItems: 'center',
+    height: 32,
+    justifyContent: 'center',
+    width: 32,
+  },
   categoryButton: {
     alignItems: 'center',
     borderRadius: 8,
