@@ -75,16 +75,21 @@ const CATEGORY_COLOR_FIELDS = [
 ];
 
 // Menu card colors, saved in the routes.routeCard* columns (app-community#1650).
-const ROUTE_COLOR_FIELDS = [
+const ROUTE_CARD_FIELDS = [
   {field: 'routeCardBackground', label: 'CardBackground'},
   {field: 'routeCardIcon', label: 'CardIcon'},
   {field: 'routeCardIconBackground', label: 'CardIconBackground'},
   {field: 'routeCardText', label: 'CardText'},
   {field: 'routeCardBorder', label: 'CardBorder'},
+];
+
+const ROUTE_MENU_FIELDS = [
   {field: 'routeMenuBackground', label: 'MenuBackground'},
   {field: 'routeMenuIcon', label: 'MenuIcon'},
   {field: 'routeMenuText', label: 'MenuText'},
 ];
+
+const ROUTE_COLOR_FIELDS = [...ROUTE_CARD_FIELDS, ...ROUTE_MENU_FIELDS];
 
 const pickRouteColors = item => Object.fromEntries(ROUTE_COLOR_FIELDS.map(({field}) => [
   field,
@@ -522,6 +527,34 @@ export default function MenuAccessConfigPage() {
         await api.fetch(`menu-config/categories/${id}`, {method: 'PATCH', body: colors});
       }
       showSuccess(`Cores replicadas para ${targetIds.length} categoria(s) do appType ${activeAppType}.`);
+      await loadMenus({preserveScroll: true});
+    } catch (error) {
+      showError(formatApiError(error));
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  // Copies this menu's card and menu colors to the other menus of its category, or of every category
+  // listed for the selected appType (app-community#1650).
+  const replicateMenuColors = async (item, scope) => {
+    const sourceId = String(item.id);
+    const colors = pickRouteColors(menuDrafts[sourceId] || toDraft(item));
+    const sourceCategoryId = String(getId(item.category) || 'none');
+    const targetIds = items
+      .filter(menu => String(menu.id) !== sourceId)
+      .filter(menu => scope === 'all' || String(getId(menu.category) || 'none') === sourceCategoryId)
+      .map(menu => String(menu.id));
+    if (!targetIds.length) {
+      showInfo(scope === 'all' ? `Nao ha outros menus no appType ${activeAppType}.` : 'Nao ha outros menus nesta categoria.');
+      return;
+    }
+    setSavingKey(`replicate-menu-${sourceId}`);
+    try {
+      for (const id of targetIds) {
+        await api.fetch(`menu-config/${id}`, {method: 'PATCH', body: colors});
+      }
+      showSuccess(`Cores replicadas para ${targetIds.length} menu(s).`);
       await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
@@ -1073,7 +1106,7 @@ export default function MenuAccessConfigPage() {
                         </View>
 
                         <View style={styles.formGrid}>
-                          {ROUTE_COLOR_FIELDS.map(({field, label}) => (
+                          {ROUTE_CARD_FIELDS.map(({field, label}) => (
                             <View key={field} style={styles.fieldColor}>
                               <Text style={styles.fieldLabel}>{label}</Text>
                               <ColorInput
@@ -1082,6 +1115,37 @@ export default function MenuAccessConfigPage() {
                                 placeholder={label}
                               />
                             </View>
+
+                        <View style={styles.formGrid}>
+                          {ROUTE_MENU_FIELDS.map(({field, label}) => (
+                            <View key={field} style={styles.fieldColor}>
+                              <Text style={styles.fieldLabel}>{label}</Text>
+                              <ColorInput
+                                value={draft[field]}
+                                onChangeText={value => setMenuDraft(item.id, {[field]: value})}
+                                placeholder={label}
+                              />
+                              <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            disabled={disabled}
+                            style={[styles.categoryButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            onPress={() => replicateMenuColors(item, 'category')}
+                          >
+                            <Icon name="copy" size={14} color={palette.buttonIcon} />
+                            <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para a categoria</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            disabled={disabled}
+                            style={[styles.categoryButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            onPress={() => replicateMenuColors(item, 'all')}
+                          >
+                            <Icon name="copy" size={14} color={palette.buttonIcon} />
+                            <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para todas as categorias</Text>
+                          </TouchableOpacity>
+                        </View>
                           ))}
                         </View>
 
