@@ -7,11 +7,13 @@ const src = fs.readFileSync(
   'utf8',
 ).replace(/\r\n/g, '\n');
 
-test('each menu row shows a read-only menu_type badge next to the route/category subtitle', () => {
-  const row = src.slice(src.indexOf('<View style={styles.menuMetaRow}>'));
-  assert.match(row.slice(0, 600), /styles\.menuMeta\}>\{route\.route/);
-  assert.match(row.slice(0, 600), /testID="menu-type-badge"/);
-  assert.match(row.slice(0, 600), /item\.menuType \|\| item\.menu_type \|\| 'home'\).toUpperCase\(\)/);
+test('each menu row shows icon, menu name and type badge on one line, without the concatenated route/category text (#1666)', () => {
+  const row = src.slice(src.indexOf('<View style={styles.menuTitleRow}>'));
+  assert.match(row.slice(0, 500), /styles\.menuTitle\}>\{draft\.menu/);
+  assert.match(row.slice(0, 500), /testID="menu-type-badge"/);
+  assert.match(row.slice(0, 500), /item\.menuType \|\| item\.menu_type \|\| 'home'\)\.toUpperCase\(\)/);
+  assert.doesNotMatch(src, /\{route\.route \|\| '-'\} em /);
+  assert.doesNotMatch(src, /styles\.menuMeta/);
 });
 
 test('the badge is display-only: menuType is never sent by saveMenu or createMenu', () => {

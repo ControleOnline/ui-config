@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -52,12 +53,31 @@ const normalizeSortOrderValue = value => {
 const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
 // Hex input with a small swatch on the left to preview the color while typing (app-community#1648).
+// The color picker only needs a #rrggbb value; anything else starts the native picker on black.
+const toPickerValue = value => {
+  const color = String(value || '').trim();
+  if (/^#[0-9a-f]{6}$/i.test(color)) return color;
+  if (/^#[0-9a-f]{3}$/i.test(color)) return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
+  return '#000000';
+};
+
+// Clicking the swatch opens the browser color palette (web); the chosen hex is written to the text field.
 const ColorInput = ({value, onChangeText, placeholder}) => (
   <View style={styles.colorInputBox}>
     <View
       testID="color-swatch"
       style={[styles.colorSwatch, HEX_COLOR.test(String(value || '').trim()) && {backgroundColor: String(value).trim()}]}
-    />
+    >
+      {Platform.OS === 'web'
+        ? React.createElement('input', {
+            type: 'color',
+            'aria-label': 'Escolher cor',
+            value: toPickerValue(value),
+            onChange: event => onChangeText(String(event.target.value).toUpperCase()),
+            style: {position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', border: 0, padding: 0},
+          })
+        : null}
+    </View>
     <TextInput
       style={styles.colorInputText}
       value={value}
@@ -974,14 +994,11 @@ export default function MenuAccessConfigPage() {
                         <View style={styles.menuHeader}>
                           <View style={styles.menuPreview}>
                             <Icon name={draft.icon || 'circle'} size={17} color={draft.routeCardIcon || draft.color} />
-                            <View style={styles.rowTitleGroup}>
+                            <View style={styles.menuTitleRow}>
                               <Text style={styles.menuTitle}>{draft.menu || item.label}</Text>
-                              <View style={styles.menuMetaRow}>
-                                <Text style={styles.menuMeta}>{route.route || '-'} em {category.name || '-'}</Text>
-                                <Text testID="menu-type-badge" style={styles.menuTypeBadge}>
-                                  {String(item.menuType || item.menu_type || 'home').toUpperCase()}
-                                </Text>
-                              </View>
+                              <Text testID="menu-type-badge" style={styles.menuTypeBadge}>
+                                {String(item.menuType || item.menu_type || 'home').toUpperCase()}
+                              </Text>
                             </View>
                           </View>
                           <View style={styles.menuHeaderActions}>

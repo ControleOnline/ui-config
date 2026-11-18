@@ -187,11 +187,14 @@ export default StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  menuMetaRow: {
+  // Icon, menu name and type badge share one line (app-community#1666).
+  menuTitleRow: {
     alignItems: 'center',
+    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
+    minWidth: 0,
   },
   // Read-only menu_type badge: HOME / TOOLBAR / CONFIGURATOR (app-community#1662).
   menuTypeBadge: {
@@ -255,6 +258,8 @@ export default StyleSheet.create({
     paddingHorizontal: 8,
   },
   colorSwatch: {
+    overflow: 'hidden',
+    position: 'relative',
     backgroundColor: 'transparent',
     borderColor: '#CBD5E1',
     borderRadius: 4,
