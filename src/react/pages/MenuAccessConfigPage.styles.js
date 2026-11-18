@@ -124,7 +124,7 @@ export default StyleSheet.create({
     justifyContent: 'flex-end',
   },
   categoryFields: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
     borderBottomColor: '#E2E8F0',
     borderBottomWidth: 1,
     flexDirection: 'row',

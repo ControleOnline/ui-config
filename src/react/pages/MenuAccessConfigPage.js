@@ -49,6 +49,13 @@ const normalizeSortOrderValue = value => {
   return normalized === '' ? '' : String(Number(normalized) || 0);
 };
 
+// Category card colors, saved in the category.categoryCard* columns (app-community#1644).
+const CATEGORY_COLOR_FIELDS = [
+  {field: 'categoryCardBackground', label: 'CardBackground'},
+  {field: 'categoryCardText', label: 'CardText'},
+  {field: 'categoryCardMenu', label: 'CardMenu'},
+];
+
 const toDraft = item => ({
   menu: item?.menu || item?.label || '',
   routeId: getId(item?.route),
@@ -281,6 +288,9 @@ export default function MenuAccessConfigPage() {
           name: category.name || '',
           icon: normalizeFeatherIcon(category.icon),
           color: category.color || '',
+          categoryCardBackground: category.categoryCardBackground || '',
+          categoryCardText: category.categoryCardText || '',
+          categoryCardMenu: category.categoryCardMenu || '',
           sortOrder: normalizeSortOrderValue(category.sortOrder ?? category.sort_order),
         },
       ])));
@@ -788,33 +798,46 @@ export default function MenuAccessConfigPage() {
                 </View>
 
                 <View style={styles.categoryFields}>
-                  <TextInput
-                    style={styles.input}
-                    value={categoryDraft.name}
-                    onChangeText={name => setCategoryDraft(categoryId, {name})}
-                    placeholder="Nome da categoria"
-                  />
-                  <DefaultFeatherIconPicker
-                    style={styles.categoryIconField}
-                    value={categoryDraft.icon}
-                    onChange={icon => setCategoryDraft(categoryId, {icon})}
-                    placeholder="Buscar icone"
-                  />
-                  <TextInput
-                    style={styles.compactInput}
-                    value={categoryDraft.color}
-                    onChangeText={color => setCategoryDraft(categoryId, {color})}
-                    placeholder="Cor"
-                  />
-                  <TextInput
-                    style={styles.orderInput}
-                    value={categoryDraft.sortOrder}
-                    keyboardType="numeric"
-                    onChangeText={sortOrder => setCategoryDraft(categoryId, {
-                      sortOrder: normalizeSortOrderValue(sortOrder),
-                    })}
-                    placeholder="Ordem"
-                  />
+                  <View style={styles.field}>
+                    <Text style={styles.fieldLabel}>Nome da categoria</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={categoryDraft.name}
+                      onChangeText={name => setCategoryDraft(categoryId, {name})}
+                      placeholder="Nome da categoria"
+                    />
+                  </View>
+                  <View style={styles.categoryIconField}>
+                    <Text style={styles.fieldLabel}>Icone da categoria</Text>
+                    <DefaultFeatherIconPicker
+                      value={categoryDraft.icon}
+                      onChange={icon => setCategoryDraft(categoryId, {icon})}
+                      placeholder="Buscar icone"
+                    />
+                  </View>
+                  {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
+                    <View key={field} style={styles.fieldSmall}>
+                      <Text style={styles.fieldLabel}>{label}</Text>
+                      <TextInput
+                        style={styles.input}
+                        value={categoryDraft[field]}
+                        onChangeText={value => setCategoryDraft(categoryId, {[field]: value})}
+                        placeholder={label}
+                      />
+                    </View>
+                  ))}
+                  <View style={styles.fieldTiny}>
+                    <Text style={styles.fieldLabel}>Ordem</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={categoryDraft.sortOrder}
+                      keyboardType="numeric"
+                      onChangeText={sortOrder => setCategoryDraft(categoryId, {
+                        sortOrder: normalizeSortOrderValue(sortOrder),
+                      })}
+                      placeholder="Ordem"
+                    />
+                  </View>
                   <TouchableOpacity
                     activeOpacity={0.82}
                     accessibilityRole="button"
