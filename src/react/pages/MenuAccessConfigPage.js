@@ -53,13 +53,13 @@ const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
 // Hex input with a small swatch on the left to preview the color while typing (app-community#1648).
 const ColorInput = ({value, onChangeText, placeholder}) => (
-  <View style={styles.colorInputRow}>
+  <View style={styles.colorInputBox}>
     <View
       testID="color-swatch"
       style={[styles.colorSwatch, HEX_COLOR.test(String(value || '').trim()) && {backgroundColor: String(value).trim()}]}
     />
     <TextInput
-      style={[styles.input, styles.colorInputText]}
+      style={styles.colorInputText}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
@@ -690,7 +690,7 @@ export default function MenuAccessConfigPage() {
                 placeholder="Buscar icone"
               />
             </View>
-            <View style={styles.fieldSmall}>
+            <View style={styles.fieldColor}>
               <Text style={styles.fieldLabel}>Cor</Text>
               <ColorInput
                 value={addDraft.color}
@@ -833,7 +833,7 @@ export default function MenuAccessConfigPage() {
                     />
                   </View>
                   {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
-                    <View key={field} style={styles.fieldSmall}>
+                    <View key={field} style={styles.fieldColor}>
                       <Text style={styles.fieldLabel}>{label}</Text>
                       <ColorInput
                         value={categoryDraft[field]}
@@ -988,7 +988,7 @@ export default function MenuAccessConfigPage() {
                               onChange={icon => setMenuDraft(item.id, {icon})}
                             />
                           </View>
-                          <View style={styles.fieldSmall}>
+                          <View style={styles.fieldColor}>
                             <Text style={styles.fieldLabel}>Cor da rota</Text>
                             <ColorInput
                               value={draft.color}

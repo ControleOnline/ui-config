@@ -217,22 +217,37 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  colorInputRow: {
+  // Color fields are half the width of the other fields; the swatch lives inside the box (app-community#1648).
+  fieldColor: {
+    width: 120,
+  },
+  colorInputBox: {
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CBD5E1',
+    borderRadius: 8,
+    borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
+    minHeight: 38,
+    paddingHorizontal: 8,
   },
   colorSwatch: {
     backgroundColor: 'transparent',
     borderColor: '#CBD5E1',
     borderRadius: 4,
     borderWidth: 1,
-    height: 22,
-    width: 22,
+    height: 18,
+    width: 18,
   },
   colorInputText: {
+    color: '#0F172A',
     flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
     minWidth: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 8,
   },
   categoryIconField: {
     minWidth: 160,
