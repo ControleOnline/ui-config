@@ -1115,6 +1115,8 @@ export default function MenuAccessConfigPage() {
                                 placeholder={label}
                               />
                             </View>
+                          ))}
+                        </View>
 
                         <View style={styles.formGrid}>
                           {ROUTE_MENU_FIELDS.map(({field, label}) => (
@@ -1125,7 +1127,9 @@ export default function MenuAccessConfigPage() {
                                 onChangeText={value => setMenuDraft(item.id, {[field]: value})}
                                 placeholder={label}
                               />
-                              <TouchableOpacity
+                            </View>
+                          ))}
+                          <TouchableOpacity
                             activeOpacity={0.82}
                             accessibilityRole="button"
                             disabled={disabled}
@@ -1145,8 +1149,6 @@ export default function MenuAccessConfigPage() {
                             <Icon name="copy" size={14} color={palette.buttonIcon} />
                             <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para todas as categorias</Text>
                           </TouchableOpacity>
-                        </View>
-                          ))}
                         </View>
 
                         <View style={styles.linkGrid}>
