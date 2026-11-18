@@ -81,6 +81,9 @@ const ROUTE_COLOR_FIELDS = [
   {field: 'routeCardIconBackground', label: 'CardIconBackground'},
   {field: 'routeCardText', label: 'CardText'},
   {field: 'routeCardBorder', label: 'CardBorder'},
+  {field: 'routeMenuBackground', label: 'MenuBackground'},
+  {field: 'routeMenuIcon', label: 'MenuIcon'},
+  {field: 'routeMenuText', label: 'MenuText'},
 ];
 
 const pickRouteColors = item => Object.fromEntries(ROUTE_COLOR_FIELDS.map(({field}) => [

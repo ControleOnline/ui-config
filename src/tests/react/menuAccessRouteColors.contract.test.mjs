@@ -7,7 +7,7 @@ const src = fs.readFileSync(
   'utf8',
 ).replace(/\r\n/g, '\n');
 
-const FIELDS = ['routeCardBackground', 'routeCardIcon', 'routeCardIconBackground', 'routeCardText', 'routeCardBorder'];
+const FIELDS = ['routeCardBackground', 'routeCardIcon', 'routeCardIconBackground', 'routeCardText', 'routeCardBorder', 'routeMenuBackground', 'routeMenuIcon', 'routeMenuText'];
 
 test('menu card exposes the five routeCard colors with labels (#1650)', () => {
   for (const f of FIELDS) {
