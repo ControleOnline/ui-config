@@ -49,6 +49,24 @@ const normalizeSortOrderValue = value => {
   return normalized === '' ? '' : String(Number(normalized) || 0);
 };
 
+const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+// Hex input with a small swatch on the left to preview the color while typing (app-community#1648).
+const ColorInput = ({value, onChangeText, placeholder}) => (
+  <View style={styles.colorInputRow}>
+    <View
+      testID="color-swatch"
+      style={[styles.colorSwatch, HEX_COLOR.test(String(value || '').trim()) && {backgroundColor: String(value).trim()}]}
+    />
+    <TextInput
+      style={[styles.input, styles.colorInputText]}
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+    />
+  </View>
+);
+
 // Category card colors, saved in the category.categoryCard* columns (app-community#1644).
 const CATEGORY_COLOR_FIELDS = [
   {field: 'categoryCardBackground', label: 'CardBackground'},
@@ -674,8 +692,7 @@ export default function MenuAccessConfigPage() {
             </View>
             <View style={styles.fieldSmall}>
               <Text style={styles.fieldLabel}>Cor</Text>
-              <TextInput
-                style={styles.input}
+              <ColorInput
                 value={addDraft.color}
                 onChangeText={color => setAddDraft(current => ({...(current || {}), color}))}
                 placeholder="#2563EB"
@@ -761,7 +778,7 @@ export default function MenuAccessConfigPage() {
                     >
                       <Icon name={expanded ? 'chevron-down' : 'chevron-right'} size={18} color={palette.buttonIcon} />
                     </TouchableOpacity>
-                    <Icon name={categoryIcon} size={18} color={categoryDraft.color} />
+                    <Icon name={categoryIcon} size={18} color={palette.buttonIcon} />
                     <Text style={styles.categoryTitle}>{categoryDraft.name || group.category?.name}</Text>
                   </View>
                   <View style={styles.categoryActions}>
@@ -818,8 +835,7 @@ export default function MenuAccessConfigPage() {
                   {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
                     <View key={field} style={styles.fieldSmall}>
                       <Text style={styles.fieldLabel}>{label}</Text>
-                      <TextInput
-                        style={styles.input}
+                      <ColorInput
                         value={categoryDraft[field]}
                         onChangeText={value => setCategoryDraft(categoryId, {[field]: value})}
                         placeholder={label}
@@ -974,8 +990,7 @@ export default function MenuAccessConfigPage() {
                           </View>
                           <View style={styles.fieldSmall}>
                             <Text style={styles.fieldLabel}>Cor da rota</Text>
-                            <TextInput
-                              style={styles.input}
+                            <ColorInput
                               value={draft.color}
                               onChangeText={color => setMenuDraft(item.id, {color})}
                             />

@@ -217,6 +217,23 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
+  colorInputRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+  },
+  colorSwatch: {
+    backgroundColor: 'transparent',
+    borderColor: '#CBD5E1',
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 22,
+    width: 22,
+  },
+  colorInputText: {
+    flex: 1,
+    minWidth: 0,
+  },
   categoryIconField: {
     minWidth: 160,
     width: 220,
