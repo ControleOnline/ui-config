@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -18,6 +19,7 @@ import {app_type_base} from '@appType';
 import {userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
 import styles from './MenuAccessConfigPage.styles';
+import {renumberByTen} from '../utils/menuOrder';
 
 const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE'];
 const LINK_TYPES = ['owner', 'director', 'manager', 'employee', 'salesman', 'after-sales'];
@@ -37,6 +39,8 @@ const getId = value => {
   return String(value).replace(/\D/g, '');
 };
 
+const DELETE_UNAVAILABLE_MESSAGE = 'Esta funcionalidade ainda está sendo elaborada, tente mais tarde…';
+
 const indexById = items =>
   Object.fromEntries((Array.isArray(items) ? items : []).map(item => [String(item.id), item]));
 
@@ -46,7 +50,74 @@ const normalizeSortOrderValue = value => {
   return normalized === '' ? '' : String(Number(normalized) || 0);
 };
 
+const HEX_COLOR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+// Hex input with a small swatch on the left to preview the color while typing (app-community#1648).
+// The color picker only needs a #rrggbb value; anything else starts the native picker on black.
+const toPickerValue = value => {
+  const color = String(value || '').trim();
+  if (/^#[0-9a-f]{6}$/i.test(color)) return color;
+  if (/^#[0-9a-f]{3}$/i.test(color)) return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
+  return '#000000';
+};
+
+// Clicking the swatch opens the browser color palette (web); the chosen hex is written to the text field.
+const ColorInput = ({value, onChangeText, placeholder}) => (
+  <View style={styles.colorInputBox}>
+    <View
+      testID="color-swatch"
+      style={[styles.colorSwatch, HEX_COLOR.test(String(value || '').trim()) && {backgroundColor: String(value).trim()}]}
+    >
+      {Platform.OS === 'web'
+        ? React.createElement('input', {
+            type: 'color',
+            'aria-label': 'Escolher cor',
+            value: toPickerValue(value),
+            onChange: event => onChangeText(String(event.target.value).toUpperCase()),
+            style: {position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', border: 0, padding: 0},
+          })
+        : null}
+    </View>
+    <TextInput
+      style={styles.colorInputText}
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+    />
+  </View>
+);
+
+// Category card colors, saved in the category.categoryCard* columns (app-community#1644).
+const CATEGORY_COLOR_FIELDS = [
+  {field: 'categoryCardBackground', label: 'CardBackground'},
+  {field: 'categoryCardText', label: 'CardText'},
+  {field: 'categoryCardMenu', label: 'MenuText'},
+];
+
+// Menu card colors, saved in the routes.routeCard* columns (app-community#1650).
+const ROUTE_CARD_FIELDS = [
+  {field: 'routeCardBackground', label: 'CardBackground'},
+  {field: 'routeCardIcon', label: 'CardIcon'},
+  {field: 'routeCardIconBackground', label: 'CardIconBackground'},
+  {field: 'routeCardText', label: 'CardText'},
+  {field: 'routeCardBorder', label: 'CardBorder'},
+];
+
+const ROUTE_MENU_FIELDS = [
+  {field: 'routeMenuBackground', label: 'MenuBackground'},
+  {field: 'routeMenuIcon', label: 'MenuIcon'},
+  {field: 'routeMenuText', label: 'MenuText'},
+];
+
+const ROUTE_COLOR_FIELDS = [...ROUTE_CARD_FIELDS, ...ROUTE_MENU_FIELDS];
+
+const pickRouteColors = item => Object.fromEntries(ROUTE_COLOR_FIELDS.map(({field}) => [
+  field,
+  item?.[field] || item?.route?.[field] || '',
+]));
+
 const toDraft = item => ({
+  ...pickRouteColors(item),
   menu: item?.menu || item?.label || '',
   routeId: getId(item?.route),
   categoryId: getId(item?.category),
@@ -130,7 +201,18 @@ export default function MenuAccessConfigPage() {
   const themeStore = useStore('theme');
   const {user} = authStore.getters;
   const {colors: themeColors = {}} = themeStore.getters || {};
-  const {showError, showSuccess} = useToastMessage();
+  const {showError, showSuccess, showInfo} = useToastMessage();
+  // Delete is not available yet: the trash buttons only announce it. The toast uses the
+  // theme's `negative` color, never a hard-coded red (#1470).
+  const announceDeleteUnavailable = () => {
+    const negative = themeColors.negative;
+    showInfo(DELETE_UNAVAILABLE_MESSAGE, negative ? {
+      styles: {
+        pressable: {borderColor: negative, borderWidth: 1},
+        indicator: {backgroundColor: negative},
+      },
+    } : undefined);
+  };
 
   const [activeAppType, setActiveAppType] = useState(isAdminApp ? 'ADMIN' : 'MANAGER');
   const [items, setItems] = useState([]);
@@ -145,6 +227,10 @@ export default function MenuAccessConfigPage() {
   const [categoryDrafts, setCategoryDrafts] = useState({});
   const [picker, setPicker] = useState(null);
   const [addDraft, setAddDraft] = useState(null);
+  // Categories start collapsed; the set holds the ids of the expanded ones (#1469).
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const toggleCategory = categoryId =>
+    setExpandedCategories(current => ({...current, [String(categoryId)]: !current[String(categoryId)]}));
   const scrollViewRef = useRef(null);
   const scrollOffsetRef = useRef(0);
 
@@ -160,6 +246,7 @@ export default function MenuAccessConfigPage() {
     buttonIconSecondary: themeColors.buttonIconSecondary,
     buttonText: themeColors.buttonText,
     buttonTextSecondary: themeColors.buttonTextSecondary,
+    negative: themeColors.negative,
   }), [themeColors]);
 
   const handleScroll = useCallback(event => {
@@ -262,6 +349,9 @@ export default function MenuAccessConfigPage() {
           name: category.name || '',
           icon: normalizeFeatherIcon(category.icon),
           color: category.color || '',
+          categoryCardBackground: category.categoryCardBackground || '',
+          categoryCardText: category.categoryCardText || '',
+          categoryCardMenu: category.categoryCardMenu || '',
           sortOrder: normalizeSortOrderValue(category.sortOrder ?? category.sort_order),
         },
       ])));
@@ -357,6 +447,37 @@ export default function MenuAccessConfigPage() {
     </TouchableOpacity>
   );
 
+  // After an order is saved, the affected level is re-spaced as 10,20,30... (#1468).
+  const patchSortOrders = async (changes, pathFor) => {
+    for (const change of changes) {
+      await api.fetch(pathFor(change.id), {method: 'PATCH', body: {sortOrder: change.sortOrder}});
+    }
+  };
+
+  const renumberMenusAfterSave = async (item, draft) => {
+    const newCategoryId = String(draft.categoryId || getId(item.category) || '');
+    const oldCategoryId = String(getId(item.category) || '');
+    for (const categoryId of new Set([newCategoryId, oldCategoryId])) {
+      if (!categoryId) continue;
+      const entries = items
+        .filter(other => String(other.id) !== String(item.id) && String(getId(other.category) || '') === categoryId)
+        .map(other => ({id: other.id, sortOrder: other.sortOrder ?? other.sort_order}));
+      const isTarget = categoryId === newCategoryId;
+      if (isTarget) entries.push({id: item.id, sortOrder: Number(draft.sortOrder || 0)});
+      await patchSortOrders(renumberByTen(entries, isTarget ? item.id : null), id => `menu-config/${id}`);
+    }
+  };
+
+  const renumberCategoriesAfterSave = async (categoryId, draft) => {
+    const entries = availableCategories.map(category => ({
+      id: getId(category),
+      sortOrder: String(getId(category)) === String(categoryId)
+        ? (draft.sortOrder === '' ? null : Number(draft.sortOrder || 0))
+        : category.sortOrder ?? category.sort_order,
+    }));
+    await patchSortOrders(renumberByTen(entries, categoryId), id => `menu-config/categories/${id}`);
+  };
+
   const saveMenu = async item => {
     const draft = menuDrafts[String(item.id)] || toDraft(item);
     setSavingKey(`menu-${item.id}`);
@@ -369,11 +490,13 @@ export default function MenuAccessConfigPage() {
           category: draft.categoryId,
           icon: normalizeFeatherIcon(draft.icon),
           color: draft.color,
+          ...pickRouteColors(draft),
           sortOrder: Number(draft.sortOrder || 0),
           enabled: Boolean(draft.enabled),
           linkTypes: draft.linkTypes,
         },
       });
+      await renumberMenusAfterSave(item, draft);
       showSuccess('Menu atualizado.');
       await loadMenus({preserveScroll: true});
     } catch (error) {
@@ -396,7 +519,62 @@ export default function MenuAccessConfigPage() {
           sortOrder: draft.sortOrder === '' ? null : Number(draft.sortOrder || 0),
         },
       });
+      await renumberCategoriesAfterSave(categoryId, draft);
       showSuccess('Categoria atualizada.');
+      await loadMenus({preserveScroll: true});
+    } catch (error) {
+      showError(formatApiError(error));
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  // Copies this category's card colors to the other categories listed for the selected appType (app-community#1655).
+  const replicateCategoryColors = async category => {
+    const sourceId = String(getId(category));
+    const source = categoryDrafts[sourceId] || {};
+    const colors = Object.fromEntries(CATEGORY_COLOR_FIELDS.map(({field}) => [field, source[field] || '']));
+    const targetIds = groupedItems
+      .map(group => String(getId(group.category)))
+      .filter(id => id && id !== 'none' && id !== sourceId);
+    if (!targetIds.length) {
+      showInfo(`Nao ha outras categorias no appType ${activeAppType}.`);
+      return;
+    }
+    setSavingKey(`replicate-${sourceId}`);
+    try {
+      for (const id of targetIds) {
+        await api.fetch(`menu-config/categories/${id}`, {method: 'PATCH', body: colors});
+      }
+      showSuccess(`Cores replicadas para ${targetIds.length} categoria(s) do appType ${activeAppType}.`);
+      await loadMenus({preserveScroll: true});
+    } catch (error) {
+      showError(formatApiError(error));
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  // Copies this menu's card and menu colors to the other menus of its category, or of every category
+  // listed for the selected appType (app-community#1650).
+  const replicateMenuColors = async (item, scope) => {
+    const sourceId = String(item.id);
+    const colors = pickRouteColors(menuDrafts[sourceId] || toDraft(item));
+    const sourceCategoryId = String(getId(item.category) || 'none');
+    const targetIds = items
+      .filter(menu => String(menu.id) !== sourceId)
+      .filter(menu => scope === 'all' || String(getId(menu.category) || 'none') === sourceCategoryId)
+      .map(menu => String(menu.id));
+    if (!targetIds.length) {
+      showInfo(scope === 'all' ? `Nao ha outros menus no appType ${activeAppType}.` : 'Nao ha outros menus nesta categoria.');
+      return;
+    }
+    setSavingKey(`replicate-menu-${sourceId}`);
+    try {
+      for (const id of targetIds) {
+        await api.fetch(`menu-config/${id}`, {method: 'PATCH', body: colors});
+      }
+      showSuccess(`Cores replicadas para ${targetIds.length} menu(s).`);
       await loadMenus({preserveScroll: true});
     } catch (error) {
       showError(formatApiError(error));
@@ -610,10 +788,9 @@ export default function MenuAccessConfigPage() {
                 placeholder="Buscar icone"
               />
             </View>
-            <View style={styles.fieldSmall}>
+            <View style={styles.fieldColor}>
               <Text style={styles.fieldLabel}>Cor</Text>
-              <TextInput
-                style={styles.input}
+              <ColorInput
                 value={addDraft.color}
                 onChangeText={color => setAddDraft(current => ({...(current || {}), color}))}
                 placeholder="#2563EB"
@@ -682,13 +859,24 @@ export default function MenuAccessConfigPage() {
           {groupedItems.map(group => {
             const categoryId = getId(group.category);
             const categoryDraft = categoryDrafts[String(categoryId)] || {};
+            const expanded = Boolean(expandedCategories[String(categoryId)]);
             const categoryIcon = normalizeFeatherIcon(categoryDraft.icon) || 'folder';
 
             return (
               <View key={categoryId || group.category?.name} style={styles.categoryBlock}>
                 <View style={styles.categoryHeader}>
                   <View style={styles.categoryPreview}>
-                    <Icon name={categoryIcon} size={18} color={categoryDraft.color} />
+                    <TouchableOpacity
+                      activeOpacity={0.82}
+                      accessibilityRole="button"
+                      accessibilityLabel={expanded ? 'Recolher categoria' : 'Expandir categoria'}
+                      accessibilityState={{expanded}}
+                      style={styles.collapseButton}
+                      onPress={() => toggleCategory(categoryId)}
+                    >
+                      <Icon name={expanded ? 'chevron-down' : 'chevron-right'} size={18} color={palette.buttonIcon} />
+                    </TouchableOpacity>
+                    <Icon name={categoryIcon} size={18} color={palette.buttonIcon} />
                     <Text style={styles.categoryTitle}>{categoryDraft.name || group.category?.name}</Text>
                   </View>
                   <View style={styles.categoryActions}>
@@ -725,35 +913,75 @@ export default function MenuAccessConfigPage() {
                 </View>
 
                 <View style={styles.categoryFields}>
-                  <TextInput
-                    style={styles.input}
-                    value={categoryDraft.name}
-                    onChangeText={name => setCategoryDraft(categoryId, {name})}
-                    placeholder="Nome da categoria"
-                  />
-                  <DefaultFeatherIconPicker
-                    style={styles.categoryIconField}
-                    value={categoryDraft.icon}
-                    onChange={icon => setCategoryDraft(categoryId, {icon})}
-                    placeholder="Buscar icone"
-                  />
-                  <TextInput
-                    style={styles.compactInput}
-                    value={categoryDraft.color}
-                    onChangeText={color => setCategoryDraft(categoryId, {color})}
-                    placeholder="Cor"
-                  />
-                  <TextInput
-                    style={styles.orderInput}
-                    value={categoryDraft.sortOrder}
-                    keyboardType="numeric"
-                    onChangeText={sortOrder => setCategoryDraft(categoryId, {
-                      sortOrder: normalizeSortOrderValue(sortOrder),
-                    })}
-                    placeholder="Ordem"
-                  />
+                <View style={styles.categoryFieldsRow}>
+                  <View style={styles.field}>
+                    <Text style={styles.fieldLabel}>Nome da categoria</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={categoryDraft.name}
+                      onChangeText={name => setCategoryDraft(categoryId, {name})}
+                      placeholder="Nome da categoria"
+                    />
+                  </View>
+                  <View style={styles.categoryIconField}>
+                    <Text style={styles.fieldLabel}>Icone da categoria</Text>
+                    <DefaultFeatherIconPicker
+                      value={categoryDraft.icon}
+                      onChange={icon => setCategoryDraft(categoryId, {icon})}
+                      placeholder="Buscar icone"
+                    />
+                  </View>
+                  <View style={styles.fieldTiny}>
+                    <Text style={styles.fieldLabel}>Ordem</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={categoryDraft.sortOrder}
+                      keyboardType="numeric"
+                      onChangeText={sortOrder => setCategoryDraft(categoryId, {
+                        sortOrder: normalizeSortOrderValue(sortOrder),
+                      })}
+                      placeholder="Ordem"
+                    />
+                  </View>
+                  <TouchableOpacity
+                    activeOpacity={0.82}
+                    accessibilityRole="button"
+                    accessibilityLabel="Apagar categoria"
+                    style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
+                    onPress={announceDeleteUnavailable}
+                  >
+                    <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.categoryFieldsRow}>
+                  {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
+                    <View key={field} style={styles.fieldColor}>
+                      <Text style={styles.fieldLabel}>{label}</Text>
+                      <ColorInput
+                        value={categoryDraft[field]}
+                        onChangeText={value => setCategoryDraft(categoryId, {[field]: value})}
+                        placeholder={label}
+                      />
+                    </View>
+                  ))}
+                  <TouchableOpacity
+                    activeOpacity={0.82}
+                    accessibilityRole="button"
+                    disabled={savingKey === `replicate-${categoryId}`}
+                    style={[
+                      styles.categoryButton,
+                      styles.replicateButton,
+                      {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder},
+                    ]}
+                    onPress={() => replicateCategoryColors(group.category)}
+                  >
+                    <Icon name="copy" size={14} color={palette.buttonIcon} />
+                    <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todas as categorias</Text>
+                  </TouchableOpacity>
+                </View>
                 </View>
 
+                {expanded ? (
                 <View style={styles.menuList}>
                   {group.menus.map(item => {
                     const draft = menuDrafts[String(item.id)] || toDraft(item);
@@ -765,12 +993,15 @@ export default function MenuAccessConfigPage() {
                       <View key={item.id} style={styles.menuRow}>
                         <View style={styles.menuHeader}>
                           <View style={styles.menuPreview}>
-                            <Icon name={draft.icon || 'circle'} size={17} color={draft.color} />
-                            <View style={styles.rowTitleGroup}>
+                            <Icon name={draft.icon || 'circle'} size={17} color={draft.routeCardIcon || draft.color} />
+                            <View style={styles.menuTitleRow}>
                               <Text style={styles.menuTitle}>{draft.menu || item.label}</Text>
-                              <Text style={styles.menuMeta}>{route.route || '-'} em {category.name || '-'}</Text>
+                              <Text testID="menu-type-badge" style={styles.menuTypeBadge}>
+                                {String(item.menuType || item.menu_type || 'home').toUpperCase()}
+                              </Text>
                             </View>
                           </View>
+                          <View style={styles.menuHeaderActions}>
                           <TouchableOpacity
                             activeOpacity={0.82}
                             style={[
@@ -804,6 +1035,22 @@ export default function MenuAccessConfigPage() {
                               {draft.enabled ? 'Ativo' : 'Inativo'}
                             </Text>
                           </TouchableOpacity>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            disabled={disabled}
+                            style={[
+                              styles.categoryButton,
+                              {
+                                backgroundColor: palette.buttonBackground,
+                                borderColor: palette.buttonBorder,
+                              },
+                            ]}
+                            onPress={() => saveMenu(item)}
+                          >
+                            <Icon name="save" size={14} color={palette.buttonIcon} />
+                            <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
+                          </TouchableOpacity>
+                          </View>
                         </View>
 
                         <View style={styles.formGrid}>
@@ -859,14 +1106,6 @@ export default function MenuAccessConfigPage() {
                               onChange={icon => setMenuDraft(item.id, {icon})}
                             />
                           </View>
-                          <View style={styles.fieldSmall}>
-                            <Text style={styles.fieldLabel}>Cor da rota</Text>
-                            <TextInput
-                              style={styles.input}
-                              value={draft.color}
-                              onChangeText={color => setMenuDraft(item.id, {color})}
-                            />
-                          </View>
                           <View style={styles.fieldTiny}>
                             <Text style={styles.fieldLabel}>Ordem</Text>
                             <TextInput
@@ -876,6 +1115,63 @@ export default function MenuAccessConfigPage() {
                               onChangeText={sortOrder => setMenuDraft(item.id, {sortOrder})}
                             />
                           </View>
+                          <View style={styles.menuTrashField}>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            accessibilityLabel="Apagar item de menu"
+                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
+                            onPress={announceDeleteUnavailable}
+                          >
+                            <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
+                          </TouchableOpacity>
+                          </View>
+                        </View>
+
+                        <View style={styles.formGrid}>
+                          {ROUTE_CARD_FIELDS.map(({field, label}) => (
+                            <View key={field} style={styles.fieldColor}>
+                              <Text style={styles.fieldLabel}>{label}</Text>
+                              <ColorInput
+                                value={draft[field]}
+                                onChangeText={value => setMenuDraft(item.id, {[field]: value})}
+                                placeholder={label}
+                              />
+                            </View>
+                          ))}
+                        </View>
+
+                        <View style={styles.formGrid}>
+                          {ROUTE_MENU_FIELDS.map(({field, label}) => (
+                            <View key={field} style={styles.fieldColor}>
+                              <Text style={styles.fieldLabel}>{label}</Text>
+                              <ColorInput
+                                value={draft[field]}
+                                onChangeText={value => setMenuDraft(item.id, {[field]: value})}
+                                placeholder={label}
+                              />
+                            </View>
+                          ))}
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            disabled={disabled}
+                            style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            onPress={() => replicateMenuColors(item, 'category')}
+                          >
+                            <Icon name="copy" size={14} color={palette.buttonIcon} />
+                            <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus desta categoria</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            disabled={disabled}
+                            style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            onPress={() => replicateMenuColors(item, 'all')}
+                          >
+                            <Icon name="copy" size={14} color={palette.buttonIcon} />
+                            <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus</Text>
+                          </TouchableOpacity>
                         </View>
 
                         <View style={styles.linkGrid}>
@@ -891,26 +1187,11 @@ export default function MenuAccessConfigPage() {
                             });
                           })}
                         </View>
-
-                        <TouchableOpacity
-                          activeOpacity={0.82}
-                          disabled={disabled}
-                          style={[
-                            styles.saveButton,
-                            {
-                              backgroundColor: palette.buttonBackground,
-                              borderColor: palette.buttonBorder,
-                            },
-                          ]}
-                          onPress={() => saveMenu(item)}
-                        >
-                          <Icon name="save" size={15} color={palette.buttonIcon} />
-                          <Text style={[styles.saveButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
-                        </TouchableOpacity>
                       </View>
                     );
                   })}
                 </View>
+                ) : null}
               </View>
             );
           })}

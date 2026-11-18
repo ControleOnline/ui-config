@@ -124,13 +124,18 @@ export default StyleSheet.create({
     justifyContent: 'flex-end',
   },
   categoryFields: {
-    alignItems: 'center',
+    alignItems: 'stretch',
     borderBottomColor: '#E2E8F0',
     borderBottomWidth: 1,
+    flexDirection: 'column',
+    gap: 8,
+    padding: 12,
+  },
+  categoryFieldsRow: {
+    alignItems: 'flex-end',
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    padding: 12,
   },
   menuList: {
     gap: 10,
@@ -151,6 +156,14 @@ export default StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     justifyContent: 'space-between',
+  },
+  // Enabled toggle and Save menu share the header's right side (#1467).
+  menuHeaderActions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'flex-end',
   },
   menuPreview: {
     alignItems: 'center',
@@ -173,6 +186,26 @@ export default StyleSheet.create({
     color: '#64748B',
     fontSize: 12,
     fontWeight: '600',
+  },
+  // Icon, menu name and type badge share one line (app-community#1666).
+  menuTitleRow: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    minWidth: 0,
+  },
+  // Read-only menu_type badge: HOME / TOOLBAR / CONFIGURATOR (app-community#1662).
+  menuTypeBadge: {
+    backgroundColor: '#E2E8F0',
+    borderRadius: 4,
+    color: '#334155',
+    fontSize: 10,
+    fontWeight: '800',
+    overflow: 'hidden',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
   },
   formGrid: {
     alignItems: 'flex-end',
@@ -207,6 +240,40 @@ export default StyleSheet.create({
     fontWeight: '700',
     minHeight: 38,
     paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  // Color fields are half the width of the other fields; the swatch lives inside the box (app-community#1648).
+  fieldColor: {
+    width: 130,
+  },
+  colorInputBox: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CBD5E1',
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 6,
+    minHeight: 38,
+    paddingHorizontal: 8,
+  },
+  colorSwatch: {
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: 'transparent',
+    borderColor: '#CBD5E1',
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 18,
+    width: 18,
+  },
+  colorInputText: {
+    color: '#0F172A',
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    minWidth: 0,
+    paddingHorizontal: 0,
     paddingVertical: 8,
   },
   categoryIconField: {
@@ -302,6 +369,26 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
   },
+  // Trash buttons sit at the bottom-right of the category header and of each item (#1470).
+  trashButton: {
+    justifyContent: 'center',
+    marginLeft: 'auto',
+    minWidth: 34,
+    paddingHorizontal: 0,
+  },
+  menuFooter: {
+    alignItems: 'flex-end',
+  },
+  // Trash sits at the end of the first field row, aligned with the inputs (#1650).
+  menuTrashField: {
+    alignSelf: 'flex-end',
+  },
+  collapseButton: {
+    alignItems: 'center',
+    height: 32,
+    justifyContent: 'center',
+    width: 32,
+  },
   categoryButton: {
     alignItems: 'center',
     borderRadius: 8,
@@ -310,6 +397,17 @@ export default StyleSheet.create({
     gap: 6,
     minHeight: 34,
     paddingHorizontal: 10,
+  },
+  // Replicate buttons keep the 34px button height; the label wraps to two lines.
+  replicateButton: {
+    height: 34,
+    maxWidth: 240,
+    paddingVertical: 2,
+  },
+  replicateButtonText: {
+    flexShrink: 1,
+    fontSize: 11,
+    lineHeight: 13,
   },
   categoryButtonText: {
     fontSize: 12,
