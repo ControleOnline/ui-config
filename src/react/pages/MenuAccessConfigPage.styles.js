@@ -352,6 +352,10 @@ export default StyleSheet.create({
   menuFooter: {
     alignItems: 'flex-end',
   },
+  // Trash sits at the end of the first field row, aligned with the inputs (#1650).
+  menuTrashField: {
+    alignSelf: 'flex-end',
+  },
   collapseButton: {
     alignItems: 'center',
     height: 32,

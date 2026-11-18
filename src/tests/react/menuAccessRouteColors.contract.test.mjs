@@ -11,7 +11,7 @@ const FIELDS = ['routeCardBackground', 'routeCardIcon', 'routeCardIconBackground
 
 test('menu card exposes the five routeCard colors with labels (#1650)', () => {
   for (const f of FIELDS) {
-    assert.match(src, new RegExp(`\\{field: '${f}', label: '${f}'\\}`));
+    assert.match(src, new RegExp(`\\{field: '${f}', label: '${f.replace('route','')}'\\}`));
   }
   const card = src.slice(src.lastIndexOf('ROUTE_COLOR_FIELDS.map'), src.lastIndexOf('availableLinkTypes.map'));
   assert.match(card, /<Text style=\{styles\.fieldLabel\}>\{label\}<\/Text>/);
@@ -21,4 +21,10 @@ test('menu card exposes the five routeCard colors with labels (#1650)', () => {
 test('drafts load and the menu PATCH saves the routeCard colors (#1650)', () => {
   assert.match(src, /\.\.\.pickRouteColors\(item\)/);
   assert.match(src, /\.\.\.pickRouteColors\(draft\)/);
+});
+
+test('legacy route color box is gone and colors sit on their own row below the trash row (#1650)', () => {
+  assert.doesNotMatch(src, /Cor da rota/);
+  const card = src.slice(src.indexOf('styles.menuTrashField'), src.lastIndexOf('availableLinkTypes.map'));
+  assert.ok(card.indexOf('Apagar item de menu') < card.indexOf('ROUTE_COLOR_FIELDS.map'));
 });

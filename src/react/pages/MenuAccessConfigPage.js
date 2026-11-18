@@ -76,11 +76,11 @@ const CATEGORY_COLOR_FIELDS = [
 
 // Menu card colors, saved in the routes.routeCard* columns (app-community#1650).
 const ROUTE_COLOR_FIELDS = [
-  {field: 'routeCardBackground', label: 'routeCardBackground'},
-  {field: 'routeCardIcon', label: 'routeCardIcon'},
-  {field: 'routeCardIconBackground', label: 'routeCardIconBackground'},
-  {field: 'routeCardText', label: 'routeCardText'},
-  {field: 'routeCardBorder', label: 'routeCardBorder'},
+  {field: 'routeCardBackground', label: 'CardBackground'},
+  {field: 'routeCardIcon', label: 'CardIcon'},
+  {field: 'routeCardIconBackground', label: 'CardIconBackground'},
+  {field: 'routeCardText', label: 'CardText'},
+  {field: 'routeCardBorder', label: 'CardBorder'},
 ];
 
 const pickRouteColors = item => Object.fromEntries(ROUTE_COLOR_FIELDS.map(({field}) => [
@@ -893,7 +893,7 @@ export default function MenuAccessConfigPage() {
                       <View key={item.id} style={styles.menuRow}>
                         <View style={styles.menuHeader}>
                           <View style={styles.menuPreview}>
-                            <Icon name={draft.icon || 'circle'} size={17} color={draft.color} />
+                            <Icon name={draft.icon || 'circle'} size={17} color={draft.routeCardIcon || draft.color} />
                             <View style={styles.rowTitleGroup}>
                               <Text style={styles.menuTitle}>{draft.menu || item.label}</Text>
                               <Text style={styles.menuMeta}>{route.route || '-'} em {category.name || '-'}</Text>
@@ -1004,13 +1004,29 @@ export default function MenuAccessConfigPage() {
                               onChange={icon => setMenuDraft(item.id, {icon})}
                             />
                           </View>
-                          <View style={styles.fieldColor}>
-                            <Text style={styles.fieldLabel}>Cor da rota</Text>
-                            <ColorInput
-                              value={draft.color}
-                              onChangeText={color => setMenuDraft(item.id, {color})}
+                          <View style={styles.fieldTiny}>
+                            <Text style={styles.fieldLabel}>Ordem</Text>
+                            <TextInput
+                              style={styles.input}
+                              value={draft.sortOrder}
+                              keyboardType="numeric"
+                              onChangeText={sortOrder => setMenuDraft(item.id, {sortOrder})}
                             />
                           </View>
+                          <View style={styles.menuTrashField}>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            accessibilityLabel="Apagar item de menu"
+                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
+                            onPress={announceDeleteUnavailable}
+                          >
+                            <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
+                          </TouchableOpacity>
+                          </View>
+                        </View>
+
+                        <View style={styles.formGrid}>
                           {ROUTE_COLOR_FIELDS.map(({field, label}) => (
                             <View key={field} style={styles.fieldColor}>
                               <Text style={styles.fieldLabel}>{label}</Text>
@@ -1021,15 +1037,6 @@ export default function MenuAccessConfigPage() {
                               />
                             </View>
                           ))}
-                          <View style={styles.fieldTiny}>
-                            <Text style={styles.fieldLabel}>Ordem</Text>
-                            <TextInput
-                              style={styles.input}
-                              value={draft.sortOrder}
-                              keyboardType="numeric"
-                              onChangeText={sortOrder => setMenuDraft(item.id, {sortOrder})}
-                            />
-                          </View>
                         </View>
 
                         <View style={styles.linkGrid}>
@@ -1044,18 +1051,6 @@ export default function MenuAccessConfigPage() {
                               onPress: () => toggleDraftLinkType(item.id, linkType),
                             });
                           })}
-                        </View>
-
-                        <View style={styles.menuFooter}>
-                          <TouchableOpacity
-                            activeOpacity={0.82}
-                            accessibilityRole="button"
-                            accessibilityLabel="Apagar item de menu"
-                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
-                            onPress={announceDeleteUnavailable}
-                          >
-                            <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
-                          </TouchableOpacity>
                         </View>
                       </View>
                     );
