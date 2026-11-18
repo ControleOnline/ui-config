@@ -501,6 +501,32 @@ export default function MenuAccessConfigPage() {
     }
   };
 
+  // Copies this category's card colors to the other categories listed for the selected appType (app-community#1655).
+  const replicateCategoryColors = async category => {
+    const sourceId = String(getId(category));
+    const source = categoryDrafts[sourceId] || {};
+    const colors = Object.fromEntries(CATEGORY_COLOR_FIELDS.map(({field}) => [field, source[field] || '']));
+    const targetIds = groupedItems
+      .map(group => String(getId(group.category)))
+      .filter(id => id && id !== 'none' && id !== sourceId);
+    if (!targetIds.length) {
+      showInfo(`Nao ha outras categorias no appType ${activeAppType}.`);
+      return;
+    }
+    setSavingKey(`replicate-${sourceId}`);
+    try {
+      for (const id of targetIds) {
+        await api.fetch(`menu-config/categories/${id}`, {method: 'PATCH', body: colors});
+      }
+      showSuccess(`Cores replicadas para ${targetIds.length} categoria(s) do appType ${activeAppType}.`);
+      await loadMenus({preserveScroll: true});
+    } catch (error) {
+      showError(formatApiError(error));
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
   const openAddMenu = categoryId => {
     setAddDraft({
       categoryId: categoryId ? String(categoryId) : '',
@@ -882,6 +908,19 @@ export default function MenuAccessConfigPage() {
                       />
                     </View>
                   ))}
+                  <TouchableOpacity
+                    activeOpacity={0.82}
+                    accessibilityRole="button"
+                    disabled={savingKey === `replicate-${categoryId}`}
+                    style={[
+                      styles.categoryButton,
+                      {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder},
+                    ]}
+                    onPress={() => replicateCategoryColors(group.category)}
+                  >
+                    <Icon name="copy" size={14} color={palette.buttonIcon} />
+                    <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para todas as categorias</Text>
+                  </TouchableOpacity>
                 </View>
                 </View>
 
