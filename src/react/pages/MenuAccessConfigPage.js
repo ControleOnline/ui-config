@@ -975,7 +975,12 @@ export default function MenuAccessConfigPage() {
                             <Icon name={draft.icon || 'circle'} size={17} color={draft.routeCardIcon || draft.color} />
                             <View style={styles.rowTitleGroup}>
                               <Text style={styles.menuTitle}>{draft.menu || item.label}</Text>
-                              <Text style={styles.menuMeta}>{route.route || '-'} em {category.name || '-'}</Text>
+                              <View style={styles.menuMetaRow}>
+                                <Text style={styles.menuMeta}>{route.route || '-'} em {category.name || '-'}</Text>
+                                <Text testID="menu-type-badge" style={styles.menuTypeBadge}>
+                                  {String(item.menuType || item.menu_type || 'home').toUpperCase()}
+                                </Text>
+                              </View>
                             </View>
                           </View>
                           <View style={styles.menuHeaderActions}>

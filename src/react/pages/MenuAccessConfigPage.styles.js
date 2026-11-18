@@ -187,6 +187,23 @@ export default StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  menuMetaRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  // Read-only menu_type badge: HOME / TOOLBAR / CONFIGURATOR (app-community#1662).
+  menuTypeBadge: {
+    backgroundColor: '#E2E8F0',
+    borderRadius: 4,
+    color: '#334155',
+    fontSize: 10,
+    fontWeight: '800',
+    overflow: 'hidden',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
   formGrid: {
     alignItems: 'flex-end',
     flexDirection: 'row',
