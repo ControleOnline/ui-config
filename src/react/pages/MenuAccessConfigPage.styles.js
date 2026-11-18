@@ -124,13 +124,18 @@ export default StyleSheet.create({
     justifyContent: 'flex-end',
   },
   categoryFields: {
-    alignItems: 'flex-end',
+    alignItems: 'stretch',
     borderBottomColor: '#E2E8F0',
     borderBottomWidth: 1,
+    flexDirection: 'column',
+    gap: 8,
+    padding: 12,
+  },
+  categoryFieldsRow: {
+    alignItems: 'flex-end',
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    padding: 12,
   },
   menuList: {
     gap: 10,
