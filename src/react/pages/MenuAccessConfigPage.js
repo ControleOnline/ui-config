@@ -74,7 +74,22 @@ const CATEGORY_COLOR_FIELDS = [
   {field: 'categoryCardMenu', label: 'CardMenu'},
 ];
 
+// Menu card colors, saved in the routes.routeCard* columns (app-community#1650).
+const ROUTE_COLOR_FIELDS = [
+  {field: 'routeCardBackground', label: 'routeCardBackground'},
+  {field: 'routeCardIcon', label: 'routeCardIcon'},
+  {field: 'routeCardIconBackground', label: 'routeCardIconBackground'},
+  {field: 'routeCardText', label: 'routeCardText'},
+  {field: 'routeCardBorder', label: 'routeCardBorder'},
+];
+
+const pickRouteColors = item => Object.fromEntries(ROUTE_COLOR_FIELDS.map(({field}) => [
+  field,
+  item?.[field] || item?.route?.[field] || '',
+]));
+
 const toDraft = item => ({
+  ...pickRouteColors(item),
   menu: item?.menu || item?.label || '',
   routeId: getId(item?.route),
   categoryId: getId(item?.category),
@@ -447,6 +462,7 @@ export default function MenuAccessConfigPage() {
           category: draft.categoryId,
           icon: normalizeFeatherIcon(draft.icon),
           color: draft.color,
+          ...pickRouteColors(draft),
           sortOrder: Number(draft.sortOrder || 0),
           enabled: Boolean(draft.enabled),
           linkTypes: draft.linkTypes,
@@ -995,6 +1011,16 @@ export default function MenuAccessConfigPage() {
                               onChangeText={color => setMenuDraft(item.id, {color})}
                             />
                           </View>
+                          {ROUTE_COLOR_FIELDS.map(({field, label}) => (
+                            <View key={field} style={styles.fieldColor}>
+                              <Text style={styles.fieldLabel}>{label}</Text>
+                              <ColorInput
+                                value={draft[field]}
+                                onChangeText={value => setMenuDraft(item.id, {[field]: value})}
+                                placeholder={label}
+                              />
+                            </View>
+                          ))}
                           <View style={styles.fieldTiny}>
                             <Text style={styles.fieldLabel}>Ordem</Text>
                             <TextInput
