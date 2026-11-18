@@ -26,5 +26,5 @@ test('swatch sits inside the bordered color box and color fields are narrow (#16
   assert.match(src, /<View style=\{styles\.colorInputBox\}>\n\s+<View\n\s+testID="color-swatch"/);
   assert.equal((src.match(/styles\.fieldColor/g) || []).length, 3);
   const styles = fs.readFileSync(new URL('../../react/pages/MenuAccessConfigPage.styles.js', import.meta.url), 'utf8');
-  assert.match(styles, /fieldColor: \{\s+width: 120,/);
+  assert.match(styles, /fieldColor: \{\s+width: 130,/);
 });

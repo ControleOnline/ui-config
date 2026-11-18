@@ -224,7 +224,7 @@ export default StyleSheet.create({
   },
   // Color fields are half the width of the other fields; the swatch lives inside the box (app-community#1648).
   fieldColor: {
-    width: 120,
+    width: 130,
   },
   colorInputBox: {
     alignItems: 'center',
