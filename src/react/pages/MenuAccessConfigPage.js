@@ -950,12 +950,13 @@ export default function MenuAccessConfigPage() {
                     disabled={savingKey === `replicate-${categoryId}`}
                     style={[
                       styles.categoryButton,
+                      styles.replicateButton,
                       {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder},
                     ]}
                     onPress={() => replicateCategoryColors(group.category)}
                   >
                     <Icon name="copy" size={14} color={palette.buttonIcon} />
-                    <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para todas as categorias</Text>
+                    <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todas as categorias</Text>
                   </TouchableOpacity>
                 </View>
                 </View>
@@ -1138,21 +1139,21 @@ export default function MenuAccessConfigPage() {
                             activeOpacity={0.82}
                             accessibilityRole="button"
                             disabled={disabled}
-                            style={[styles.categoryButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
                             onPress={() => replicateMenuColors(item, 'category')}
                           >
                             <Icon name="copy" size={14} color={palette.buttonIcon} />
-                            <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para a categoria</Text>
+                            <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus desta categoria</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             activeOpacity={0.82}
                             accessibilityRole="button"
                             disabled={disabled}
-                            style={[styles.categoryButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                            style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
                             onPress={() => replicateMenuColors(item, 'all')}
                           >
                             <Icon name="copy" size={14} color={palette.buttonIcon} />
-                            <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Replicar para todas as categorias</Text>
+                            <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus</Text>
                           </TouchableOpacity>
                         </View>
 

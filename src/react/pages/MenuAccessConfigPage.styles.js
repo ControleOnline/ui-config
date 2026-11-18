@@ -393,6 +393,17 @@ export default StyleSheet.create({
     minHeight: 34,
     paddingHorizontal: 10,
   },
+  // Replicate buttons keep the 34px button height; the label wraps to two lines.
+  replicateButton: {
+    height: 34,
+    maxWidth: 240,
+    paddingVertical: 2,
+  },
+  replicateButtonText: {
+    flexShrink: 1,
+    fontSize: 11,
+    lineHeight: 13,
+  },
   categoryButtonText: {
     fontSize: 12,
     fontWeight: '800',

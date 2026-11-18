@@ -37,8 +37,8 @@ test('card colors and menu colors sit on separate rows; replicate buttons follow
   assert.match(card.slice(cardRow, menuRow), /<\/View>\s+<View style=\{styles\.formGrid\}>\s*\{$/);
   assert.ok(card.indexOf("replicateMenuColors(item, 'category')") > menuRow);
   assert.ok(card.indexOf("replicateMenuColors(item, 'all')") > card.indexOf("replicateMenuColors(item, 'category')"));
-  assert.match(card, /Replicar para a categoria/);
-  assert.match(card, /Replicar para todas as categorias/);
+  assert.match(card, /Replicar estas cores para todos os menus desta categoria/);
+  assert.match(card, /Replicar estas cores para todos os menus</);
 });
 
 test('replicate copies only the colors to the other menus of the category or of all categories (#1650)', () => {
