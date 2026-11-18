@@ -71,7 +71,7 @@ const ColorInput = ({value, onChangeText, placeholder}) => (
 const CATEGORY_COLOR_FIELDS = [
   {field: 'categoryCardBackground', label: 'CardBackground'},
   {field: 'categoryCardText', label: 'CardText'},
-  {field: 'categoryCardMenu', label: 'CardMenu'},
+  {field: 'categoryCardMenu', label: 'MenuText'},
 ];
 
 // Menu card colors, saved in the routes.routeCard* columns (app-community#1650).
@@ -831,6 +831,7 @@ export default function MenuAccessConfigPage() {
                 </View>
 
                 <View style={styles.categoryFields}>
+                <View style={styles.categoryFieldsRow}>
                   <View style={styles.field}>
                     <Text style={styles.fieldLabel}>Nome da categoria</Text>
                     <TextInput
@@ -848,16 +849,6 @@ export default function MenuAccessConfigPage() {
                       placeholder="Buscar icone"
                     />
                   </View>
-                  {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
-                    <View key={field} style={styles.fieldColor}>
-                      <Text style={styles.fieldLabel}>{label}</Text>
-                      <ColorInput
-                        value={categoryDraft[field]}
-                        onChangeText={value => setCategoryDraft(categoryId, {[field]: value})}
-                        placeholder={label}
-                      />
-                    </View>
-                  ))}
                   <View style={styles.fieldTiny}>
                     <Text style={styles.fieldLabel}>Ordem</Text>
                     <TextInput
@@ -879,6 +870,19 @@ export default function MenuAccessConfigPage() {
                   >
                     <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
                   </TouchableOpacity>
+                </View>
+                <View style={styles.categoryFieldsRow}>
+                  {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
+                    <View key={field} style={styles.fieldColor}>
+                      <Text style={styles.fieldLabel}>{label}</Text>
+                      <ColorInput
+                        value={categoryDraft[field]}
+                        onChangeText={value => setCategoryDraft(categoryId, {[field]: value})}
+                        placeholder={label}
+                      />
+                    </View>
+                  ))}
+                </View>
                 </View>
 
                 {expanded ? (
