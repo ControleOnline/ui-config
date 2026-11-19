@@ -1,27 +1,17 @@
 {
-  "version": "1.0.47",
+  "version": "1.0.48",
   "rc": 1,
-  "branch": "rc/1.0.47-rc.1",
-  "baseMaster": "0fdac39f4c8bee4de15c5e399cd3e2076ff49aad",
+  "branch": "rc/1.0.48-rc.1",
+  "baseMaster": "325a67f77a2d72c4e7ccfd50d2cc3259a3df756d",
   "tasks": [
-    1650,
-    1655,
-    1658,
-    1662,
-    1666
+    1711
   ],
-  "additionalTasks": [
-    1644,
-    1648,
-    1664
-  ],
-  "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/ui-config": "43f19a913da50841dfb599b6cc4605abc82d3c19"
+    "ControleOnline/ui-config": "13e17079267ced2576c3bf1bb8529c65d0d7ae2c"
   },
   "validation": {
-    "scope": "master 0fdac39 + published v1.0.32..v1.0.46 (fast-forward) + version 1.0.47. Same tree as the already published 1.0.46 apart from package.json version, so the master merge publishes 1.0.47 from master. No file removed.",
-    "includes": "1644/1648 category labels+CardBackground/CardText/MenuText, 1650 route colors, 1655 replicate categories, 1658 width 130, 1662 type badge, 1664 replicate labels, 1666 one-line header + palette; plus 1467-1470 already consumed by production (ui-config 1.0.32)."
+    "scope": "Task 1711 (app-community): botoes, campos de texto, dropdowns e campo de cor do menu-access-config-page com 32px de altura.",
+    "checks": "Testes de contrato menuAccess* 23/23, incluindo menuAccessControlHeight."
   }
 }
