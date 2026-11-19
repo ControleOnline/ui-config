@@ -144,21 +144,37 @@ export default StyleSheet.create({
     gap: 10,
     padding: 12,
   },
-  menuRow: {
-    borderColor: '#E2E8F0',
+  // The route follows the category card: same block, header and title colors (app-community#1716).
+  routeBlock: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#D8E0EA',
     borderRadius: 8,
     borderWidth: 1,
-    gap: 12,
-    padding: 12,
+    overflow: 'hidden',
   },
-  rowDisabled: {
-    opacity: 0.62,
-  },
-  menuHeader: {
-    alignItems: 'flex-start',
+  routeHeader: {
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    borderBottomColor: '#E2E8F0',
+    borderBottomWidth: 1,
     flexDirection: 'row',
     gap: 12,
     justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  routeBody: {
+    gap: 12,
+    padding: 12,
+  },
+  routeTitle: {
+    color: '#0F172A',
+    flexShrink: 1,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  rowDisabled: {
+    opacity: 0.62,
   },
   // Enabled toggle and Save menu share the header's right side (#1467).
   menuHeaderActions: {
@@ -179,11 +195,6 @@ export default StyleSheet.create({
     flex: 1,
     gap: 3,
     minWidth: 0,
-  },
-  menuTitle: {
-    color: '#0F172A',
-    fontSize: 15,
-    fontWeight: '800',
   },
   menuMeta: {
     color: '#64748B',

@@ -990,12 +990,12 @@ export default function MenuAccessConfigPage() {
                     const disabled = savingKey === `menu-${item.id}`;
 
                     return (
-                      <View key={item.id} style={styles.menuRow}>
-                        <View style={styles.menuHeader}>
+                      <View key={item.id} style={styles.routeBlock}>
+                        <View style={styles.routeHeader}>
                           <View style={styles.menuPreview}>
                             <Icon name={draft.icon || 'circle'} size={17} color={draft.routeCardIcon || draft.color} />
                             <View style={styles.menuTitleRow}>
-                              <Text style={styles.menuTitle}>{draft.menu || item.label}</Text>
+                              <Text style={styles.routeTitle}>{draft.menu || item.label}</Text>
                               <Text testID="menu-type-badge" style={styles.menuTypeBadge}>
                                 {String(item.menuType || item.menu_type || 'home').toUpperCase()}
                               </Text>
@@ -1052,140 +1052,141 @@ export default function MenuAccessConfigPage() {
                           </TouchableOpacity>
                           </View>
                         </View>
-
-                        <View style={styles.formGrid}>
-                          <View style={styles.field}>
-                            <Text style={styles.fieldLabel}>Texto</Text>
-                            <TextInput
-                              style={styles.input}
-                              value={draft.menu}
-                              onChangeText={menu => setMenuDraft(item.id, {menu})}
-                            />
-                          </View>
-                          <View style={styles.field}>
-                            <Text style={styles.fieldLabel}>Rota</Text>
-                            <TouchableOpacity
-                              style={styles.selectField}
-                              onPress={() => setPicker({
-                                title: 'Selecionar rota',
-                                options: routeOptions,
-                                selectedId: draft.routeId,
-                                onSelect: option => {
-                                  const selectedRoute = routeById[String(option.id)] || option;
-                                  setMenuDraft(item.id, {
-                                    routeId: String(option.id),
-                                    icon: normalizeFeatherIcon(selectedRoute.icon),
-                                    color: selectedRoute.color || '',
-                                  });
-                                },
-                              })}
-                            >
-                              <Text style={styles.selectText}>{route.route || 'Selecionar'}</Text>
-                              <Icon name="chevron-down" size={15} color="#64748B" />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.field}>
-                            <Text style={styles.fieldLabel}>Categoria</Text>
-                            <TouchableOpacity
-                              style={styles.selectField}
-                              onPress={() => setPicker({
-                                title: 'Selecionar categoria',
-                                options: categoryOptions,
-                                selectedId: draft.categoryId,
-                                onSelect: option => setMenuDraft(item.id, {categoryId: String(option.id)}),
-                              })}
-                            >
-                              <Text style={styles.selectText}>{category.name || 'Selecionar'}</Text>
-                              <Icon name="chevron-down" size={15} color="#64748B" />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.fieldSmall}>
-                            <Text style={styles.fieldLabel}>Icone da rota</Text>
-                            <DefaultFeatherIconPicker
-                              value={draft.icon}
-                              onChange={icon => setMenuDraft(item.id, {icon})}
-                            />
-                          </View>
-                          <View style={styles.fieldTiny}>
-                            <Text style={styles.fieldLabel}>Ordem</Text>
-                            <TextInput
-                              style={styles.input}
-                              value={draft.sortOrder}
-                              keyboardType="numeric"
-                              onChangeText={sortOrder => setMenuDraft(item.id, {sortOrder})}
-                            />
-                          </View>
-                          <View style={styles.menuTrashField}>
-                          <TouchableOpacity
-                            activeOpacity={0.82}
-                            accessibilityRole="button"
-                            accessibilityLabel="Apagar item de menu"
-                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
-                            onPress={announceDeleteUnavailable}
-                          >
-                            <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
-                          </TouchableOpacity>
-                          </View>
-                        </View>
-
-                        <View style={styles.formGrid}>
-                          {ROUTE_CARD_FIELDS.map(({field, label}) => (
-                            <View key={field} style={styles.fieldColor}>
-                              <Text style={styles.fieldLabel}>{label}</Text>
-                              <ColorInput
-                                value={draft[field]}
-                                onChangeText={value => setMenuDraft(item.id, {[field]: value})}
-                                placeholder={label}
+                        <View style={styles.routeBody}>
+                          <View style={styles.formGrid}>
+                            <View style={styles.field}>
+                              <Text style={styles.fieldLabel}>Texto</Text>
+                              <TextInput
+                                style={styles.input}
+                                value={draft.menu}
+                                onChangeText={menu => setMenuDraft(item.id, {menu})}
                               />
                             </View>
-                          ))}
-                        </View>
-
-                        <View style={styles.formGrid}>
-                          {ROUTE_MENU_FIELDS.map(({field, label}) => (
-                            <View key={field} style={styles.fieldColor}>
-                              <Text style={styles.fieldLabel}>{label}</Text>
-                              <ColorInput
-                                value={draft[field]}
-                                onChangeText={value => setMenuDraft(item.id, {[field]: value})}
-                                placeholder={label}
+                            <View style={styles.field}>
+                              <Text style={styles.fieldLabel}>Rota</Text>
+                              <TouchableOpacity
+                                style={styles.selectField}
+                                onPress={() => setPicker({
+                                  title: 'Selecionar rota',
+                                  options: routeOptions,
+                                  selectedId: draft.routeId,
+                                  onSelect: option => {
+                                    const selectedRoute = routeById[String(option.id)] || option;
+                                    setMenuDraft(item.id, {
+                                      routeId: String(option.id),
+                                      icon: normalizeFeatherIcon(selectedRoute.icon),
+                                      color: selectedRoute.color || '',
+                                    });
+                                  },
+                                })}
+                              >
+                                <Text style={styles.selectText}>{route.route || 'Selecionar'}</Text>
+                                <Icon name="chevron-down" size={15} color="#64748B" />
+                              </TouchableOpacity>
+                            </View>
+                            <View style={styles.field}>
+                              <Text style={styles.fieldLabel}>Categoria</Text>
+                              <TouchableOpacity
+                                style={styles.selectField}
+                                onPress={() => setPicker({
+                                  title: 'Selecionar categoria',
+                                  options: categoryOptions,
+                                  selectedId: draft.categoryId,
+                                  onSelect: option => setMenuDraft(item.id, {categoryId: String(option.id)}),
+                                })}
+                              >
+                                <Text style={styles.selectText}>{category.name || 'Selecionar'}</Text>
+                                <Icon name="chevron-down" size={15} color="#64748B" />
+                              </TouchableOpacity>
+                            </View>
+                            <View style={styles.fieldSmall}>
+                              <Text style={styles.fieldLabel}>Icone da rota</Text>
+                              <DefaultFeatherIconPicker
+                                value={draft.icon}
+                                onChange={icon => setMenuDraft(item.id, {icon})}
                               />
                             </View>
-                          ))}
-                          <TouchableOpacity
-                            activeOpacity={0.82}
-                            accessibilityRole="button"
-                            disabled={disabled}
-                            style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
-                            onPress={() => replicateMenuColors(item, 'category')}
-                          >
-                            <Icon name="copy" size={14} color={palette.buttonIcon} />
-                            <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus desta categoria</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            activeOpacity={0.82}
-                            accessibilityRole="button"
-                            disabled={disabled}
-                            style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
-                            onPress={() => replicateMenuColors(item, 'all')}
-                          >
-                            <Icon name="copy" size={14} color={palette.buttonIcon} />
-                            <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus</Text>
-                          </TouchableOpacity>
-                        </View>
+                            <View style={styles.fieldTiny}>
+                              <Text style={styles.fieldLabel}>Ordem</Text>
+                              <TextInput
+                                style={styles.input}
+                                value={draft.sortOrder}
+                                keyboardType="numeric"
+                                onChangeText={sortOrder => setMenuDraft(item.id, {sortOrder})}
+                              />
+                            </View>
+                            <View style={styles.menuTrashField}>
+                            <TouchableOpacity
+                              activeOpacity={0.82}
+                              accessibilityRole="button"
+                              accessibilityLabel="Apagar item de menu"
+                              style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
+                              onPress={announceDeleteUnavailable}
+                            >
+                              <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
+                            </TouchableOpacity>
+                            </View>
+                          </View>
 
-                        <View style={styles.linkGrid}>
-                          {availableLinkTypes.map(linkType => {
-                            const selected = draft.linkTypes.includes(linkType);
+                          <View style={styles.formGrid}>
+                            {ROUTE_CARD_FIELDS.map(({field, label}) => (
+                              <View key={field} style={styles.fieldColor}>
+                                <Text style={styles.fieldLabel}>{label}</Text>
+                                <ColorInput
+                                  value={draft[field]}
+                                  onChangeText={value => setMenuDraft(item.id, {[field]: value})}
+                                  placeholder={label}
+                                />
+                              </View>
+                            ))}
+                          </View>
 
-                            return renderLinkTypeButton({
-                              key: `${item.id}-${linkType}`,
-                              linkType,
-                              selected,
-                              disabled,
-                              onPress: () => toggleDraftLinkType(item.id, linkType),
-                            });
-                          })}
+                          <View style={styles.formGrid}>
+                            {ROUTE_MENU_FIELDS.map(({field, label}) => (
+                              <View key={field} style={styles.fieldColor}>
+                                <Text style={styles.fieldLabel}>{label}</Text>
+                                <ColorInput
+                                  value={draft[field]}
+                                  onChangeText={value => setMenuDraft(item.id, {[field]: value})}
+                                  placeholder={label}
+                                />
+                              </View>
+                            ))}
+                            <TouchableOpacity
+                              activeOpacity={0.82}
+                              accessibilityRole="button"
+                              disabled={disabled}
+                              style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                              onPress={() => replicateMenuColors(item, 'category')}
+                            >
+                              <Icon name="copy" size={14} color={palette.buttonIcon} />
+                              <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus desta categoria</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              activeOpacity={0.82}
+                              accessibilityRole="button"
+                              disabled={disabled}
+                              style={[styles.categoryButton, styles.replicateButton, {backgroundColor: palette.buttonBackground, borderColor: palette.buttonBorder}]}
+                              onPress={() => replicateMenuColors(item, 'all')}
+                            >
+                              <Icon name="copy" size={14} color={palette.buttonIcon} />
+                              <Text style={[styles.categoryButtonText, styles.replicateButtonText, {color: palette.buttonText}]} numberOfLines={2}>Replicar estas cores para todos os menus</Text>
+                            </TouchableOpacity>
+                          </View>
+
+                          <View style={styles.linkGrid}>
+                            {availableLinkTypes.map(linkType => {
+                              const selected = draft.linkTypes.includes(linkType);
+
+                              return renderLinkTypeButton({
+                                key: `${item.id}-${linkType}`,
+                                linkType,
+                                selected,
+                                disabled,
+                                onPress: () => toggleDraftLinkType(item.id, linkType),
+                              });
+                            })}
+                          </View>
                         </View>
                       </View>
                     );
