@@ -1,17 +1,17 @@
 {
-  "version": "1.0.50",
+  "version": "1.0.51",
   "rc": 1,
-  "branch": "rc/1.0.50-rc.1",
+  "branch": "rc/1.0.51-rc.1",
   "baseMaster": "42aab846f6e69cfd1c92133afa461cda84d824d8",
   "tasks": [
-    1716
+    1718
   ],
   "frozen": true,
   "repositories": {
-    "ControleOnline/ui-config": "68344727af47b94e4750e7eee38447c0e1ee8008"
+    "ControleOnline/ui-config": "b5e55173e4fc5eb937b45540494bc4872e64e72d"
   },
   "validation": {
-    "scope": "Task 1716 (app-community): a rota ganha routeBlock, routeHeader e routeTitle com as mesmas cores de categoryBlock, categoryHeader e categoryTitle; campos em routeBody.",
-    "checks": "Testes de contrato menuAccess* 26/26 (menuAccessRouteCard novo)."
+    "scope": "Task 1718 (app-community): cores fixas do miolo (categoria e rotas) do menu-access-config-page centralizadas em MenuAccessConfigPage.colors.js, nomeadas pela funcao, sem duplicidade de valor. Sem mudanca visual.",
+    "checks": "Testes de contrato menuAccess* 29/29 (menuAccessColorTokens novo)."
   }
 }
