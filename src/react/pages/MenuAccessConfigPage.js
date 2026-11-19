@@ -19,6 +19,7 @@ import {app_type_base} from '@appType';
 import {userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
 import styles from './MenuAccessConfigPage.styles';
+import menuAccessColors from './MenuAccessConfigPage.colors';
 import {renumberByTen} from '../utils/menuOrder';
 
 const APP_TYPES = ['ADMIN', 'MANAGER', 'CRM', 'POS', 'DELIVERY', 'PPC', 'SHOP', 'SERVICE'];
@@ -1081,7 +1082,7 @@ export default function MenuAccessConfigPage() {
                                 })}
                               >
                                 <Text style={styles.selectText}>{route.route || 'Selecionar'}</Text>
-                                <Icon name="chevron-down" size={15} color="#64748B" />
+                                <Icon name="chevron-down" size={15} color={menuAccessColors.iconMuted} />
                               </TouchableOpacity>
                             </View>
                             <View style={styles.field}>
@@ -1096,7 +1097,7 @@ export default function MenuAccessConfigPage() {
                                 })}
                               >
                                 <Text style={styles.selectText}>{category.name || 'Selecionar'}</Text>
-                                <Icon name="chevron-down" size={15} color="#64748B" />
+                                <Icon name="chevron-down" size={15} color={menuAccessColors.iconMuted} />
                               </TouchableOpacity>
                             </View>
                             <View style={styles.fieldSmall}>

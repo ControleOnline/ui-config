@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import menuAccessColors from './MenuAccessConfigPage.colors';
 
 export default StyleSheet.create({
   container: {
@@ -89,16 +90,16 @@ export default StyleSheet.create({
     paddingBottom: 24,
   },
   categoryBlock: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8E0EA',
+    backgroundColor: menuAccessColors.blockBackground,
+    borderColor: menuAccessColors.blockBorder,
     borderRadius: 8,
     borderWidth: 1,
     overflow: 'hidden',
   },
   categoryHeader: {
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
-    borderBottomColor: '#E2E8F0',
+    backgroundColor: menuAccessColors.headerBackground,
+    borderBottomColor: menuAccessColors.divider,
     borderBottomWidth: 1,
     flexDirection: 'row',
     gap: 12,
@@ -114,7 +115,7 @@ export default StyleSheet.create({
     minWidth: 0,
   },
   categoryTitle: {
-    color: '#0F172A',
+    color: menuAccessColors.textTitle,
     flexShrink: 1,
     fontSize: 16,
     fontWeight: '800',
@@ -128,7 +129,7 @@ export default StyleSheet.create({
   },
   categoryFields: {
     alignItems: 'stretch',
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: menuAccessColors.divider,
     borderBottomWidth: 1,
     flexDirection: 'column',
     gap: 8,
@@ -146,16 +147,16 @@ export default StyleSheet.create({
   },
   // The route follows the category card: same block, header and title colors (app-community#1716).
   routeBlock: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8E0EA',
+    backgroundColor: menuAccessColors.blockBackground,
+    borderColor: menuAccessColors.blockBorder,
     borderRadius: 8,
     borderWidth: 1,
     overflow: 'hidden',
   },
   routeHeader: {
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
-    borderBottomColor: '#E2E8F0',
+    backgroundColor: menuAccessColors.headerBackground,
+    borderBottomColor: menuAccessColors.divider,
     borderBottomWidth: 1,
     flexDirection: 'row',
     gap: 12,
@@ -168,7 +169,7 @@ export default StyleSheet.create({
     padding: 12,
   },
   routeTitle: {
-    color: '#0F172A',
+    color: menuAccessColors.textTitle,
     flexShrink: 1,
     fontSize: 15,
     fontWeight: '800',
@@ -212,9 +213,9 @@ export default StyleSheet.create({
   },
   // Read-only menu_type badge: HOME / TOOLBAR / CONFIGURATOR (app-community#1662).
   menuTypeBadge: {
-    backgroundColor: '#E2E8F0',
+    backgroundColor: menuAccessColors.badgeBackground,
     borderRadius: 4,
-    color: '#334155',
+    color: menuAccessColors.badgeText,
     fontSize: 10,
     fontWeight: '800',
     overflow: 'hidden',
@@ -239,17 +240,17 @@ export default StyleSheet.create({
     width: 82,
   },
   fieldLabel: {
-    color: '#64748B',
+    color: menuAccessColors.textLabel,
     fontSize: 11,
     fontWeight: '800',
     marginBottom: 5,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     fontSize: 13,
     fontWeight: '700',
     minHeight: 32,
@@ -262,8 +263,8 @@ export default StyleSheet.create({
   },
   colorInputBox: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -275,14 +276,14 @@ export default StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     backgroundColor: 'transparent',
-    borderColor: '#CBD5E1',
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 4,
     borderWidth: 1,
     height: 18,
     width: 18,
   },
   colorInputText: {
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     flex: 1,
     fontSize: 13,
     fontWeight: '700',
@@ -295,11 +296,11 @@ export default StyleSheet.create({
     width: 220,
   },
   compactInput: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     fontSize: 13,
     fontWeight: '700',
     minHeight: 32,
@@ -308,11 +309,11 @@ export default StyleSheet.create({
     paddingVertical: 4,
   },
   orderInput: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     fontSize: 13,
     fontWeight: '700',
     minHeight: 32,
@@ -322,8 +323,8 @@ export default StyleSheet.create({
   },
   selectField: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -334,7 +335,7 @@ export default StyleSheet.create({
     paddingVertical: 4,
   },
   selectText: {
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     flexShrink: 1,
     fontSize: 13,
     fontWeight: '700',
