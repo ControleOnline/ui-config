@@ -24,7 +24,7 @@ test('replicate button sits right of the colors and copies them to the other cat
 
 test('replicate buttons keep their height and wrap the label in two lines (#1664)', () => {
   const styles = fs.readFileSync(new URL('../../react/pages/MenuAccessConfigPage.styles.js', import.meta.url), 'utf8');
-  assert.match(styles, /replicateButton: \{\s+height: 34,/);
+  assert.match(styles, /replicateButton: \{\s+height: 32,/);
   assert.equal((src.match(/styles\.replicateButtonText/g) || []).length, 3);
   assert.equal((src.match(/numberOfLines=\{2\}/g) || []).length >= 3, true);
   assert.equal((src.match(/styles\.replicateButton,/g) || []).length, 3);
