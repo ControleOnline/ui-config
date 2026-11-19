@@ -46,8 +46,9 @@ export default StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     justifyContent: 'space-between',
+    minHeight: 32,
     paddingHorizontal: 12,
-    paddingVertical: 9,
+    paddingVertical: 4,
   },
   appTypeSelectText: {
     color: '#0F172A',
@@ -67,8 +68,10 @@ export default StyleSheet.create({
     top: 59,
   },
   appTypeOption: {
+    justifyContent: 'center',
+    minHeight: 32,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 4,
   },
   appTypeOptionActive: {
     backgroundColor: '#EFF6FF',
@@ -238,9 +241,9 @@ export default StyleSheet.create({
     color: '#0F172A',
     fontSize: 13,
     fontWeight: '700',
-    minHeight: 38,
+    minHeight: 32,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   // Color fields are half the width of the other fields; the swatch lives inside the box (app-community#1648).
   fieldColor: {
@@ -254,7 +257,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
-    minHeight: 38,
+    minHeight: 32,
     paddingHorizontal: 8,
   },
   colorSwatch: {
@@ -274,7 +277,7 @@ export default StyleSheet.create({
     fontWeight: '700',
     minWidth: 0,
     paddingHorizontal: 0,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   categoryIconField: {
     minWidth: 160,
@@ -288,10 +291,10 @@ export default StyleSheet.create({
     color: '#0F172A',
     fontSize: 13,
     fontWeight: '700',
-    minHeight: 38,
+    minHeight: 32,
     minWidth: 120,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   orderInput: {
     backgroundColor: '#FFFFFF',
@@ -301,9 +304,9 @@ export default StyleSheet.create({
     color: '#0F172A',
     fontSize: 13,
     fontWeight: '700',
-    minHeight: 38,
+    minHeight: 32,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 4,
     width: 88,
   },
   selectField: {
@@ -315,9 +318,9 @@ export default StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'space-between',
-    minHeight: 38,
+    minHeight: 32,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   selectText: {
     color: '#0F172A',
@@ -331,8 +334,9 @@ export default StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
+    minHeight: 32,
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 0,
   },
   enabledText: {
     fontSize: 12,
@@ -349,7 +353,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 7,
-    minHeight: 34,
+    minHeight: 32,
     paddingHorizontal: 10,
   },
   linkText: {
@@ -362,7 +366,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 7,
-    minHeight: 38,
+    minHeight: 32,
     paddingHorizontal: 12,
   },
   primaryButtonText: {
@@ -373,7 +377,7 @@ export default StyleSheet.create({
   trashButton: {
     justifyContent: 'center',
     marginLeft: 'auto',
-    minWidth: 34,
+    minWidth: 32,
     paddingHorizontal: 0,
   },
   menuFooter: {
@@ -395,12 +399,12 @@ export default StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
-    minHeight: 34,
+    minHeight: 32,
     paddingHorizontal: 10,
   },
-  // Replicate buttons keep the 34px button height; the label wraps to two lines.
+  // Replicate buttons keep the 32px control height; the label wraps to two lines.
   replicateButton: {
-    height: 34,
+    height: 32,
     maxWidth: 240,
     paddingVertical: 2,
   },
@@ -420,7 +424,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 7,
-    minHeight: 36,
+    minHeight: 32,
     paddingHorizontal: 12,
   },
   saveButtonText: {
@@ -431,9 +435,9 @@ export default StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F1F5F9',
     borderRadius: 8,
-    height: 34,
+    height: 32,
     justifyContent: 'center',
-    width: 34,
+    width: 32,
   },
   addPanel: {
     backgroundColor: '#FFFFFF',
@@ -515,7 +519,7 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     marginBottom: 10,
-    minHeight: 38,
+    minHeight: 32,
     paddingHorizontal: 10,
   },
   modalOptions: {
@@ -525,8 +529,10 @@ export default StyleSheet.create({
     borderColor: '#E2E8F0',
     borderRadius: 8,
     borderWidth: 1,
+    justifyContent: 'center',
+    minHeight: 32,
     paddingHorizontal: 10,
-    paddingVertical: 9,
+    paddingVertical: 4,
   },
   optionTextGroup: {
     flex: 1,
