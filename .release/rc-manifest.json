@@ -1,17 +1,17 @@
 {
-  "version": "1.0.52",
+  "version": "1.0.53",
   "rc": 1,
-  "branch": "rc/1.0.52-rc.1",
+  "branch": "rc/1.0.53-rc.1",
   "baseMaster": "42aab846f6e69cfd1c92133afa461cda84d824d8",
   "tasks": [
-    1720
+    1724
   ],
   "frozen": true,
   "repositories": {
-    "ControleOnline/ui-config": "c16b0488a911fed909db10db4dc8bddf39c87ba6"
+    "ControleOnline/ui-config": "a5a1f66dcb31b4724aa2be905440c205b8d7661e"
   },
   "validation": {
-    "scope": "Task 1720 (app-community): borda do categoryBlock com 4px e do routeBlock com 2px.",
-    "checks": "Testes de contrato menuAccess* 30/30."
+    "scope": "Task 1724 (app-community): espaco de 18px entre o bloco da categoria e a primeira rota e entre as rotas.",
+    "checks": "Testes de contrato menuAccess* 31/31."
   }
 }
