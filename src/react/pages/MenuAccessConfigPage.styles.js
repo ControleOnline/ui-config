@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import menuAccessColors from './MenuAccessConfigPage.colors';
 
 export default StyleSheet.create({
   container: {
@@ -89,16 +90,16 @@ export default StyleSheet.create({
     paddingBottom: 24,
   },
   categoryBlock: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8E0EA',
+    backgroundColor: menuAccessColors.blockBackground,
+    borderColor: menuAccessColors.blockBorder,
     borderRadius: 8,
-    borderWidth: 1,
+    borderWidth: 4,
     overflow: 'hidden',
   },
   categoryHeader: {
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
-    borderBottomColor: '#E2E8F0',
+    backgroundColor: menuAccessColors.headerBackground,
+    borderBottomColor: menuAccessColors.divider,
     borderBottomWidth: 1,
     flexDirection: 'row',
     gap: 12,
@@ -114,7 +115,7 @@ export default StyleSheet.create({
     minWidth: 0,
   },
   categoryTitle: {
-    color: '#0F172A',
+    color: menuAccessColors.textTitle,
     flexShrink: 1,
     fontSize: 16,
     fontWeight: '800',
@@ -128,7 +129,7 @@ export default StyleSheet.create({
   },
   categoryFields: {
     alignItems: 'stretch',
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: menuAccessColors.divider,
     borderBottomWidth: 1,
     flexDirection: 'column',
     gap: 8,
@@ -141,24 +142,41 @@ export default StyleSheet.create({
     gap: 8,
   },
   menuList: {
-    gap: 10,
+    gap: 18,
     padding: 12,
+    paddingTop: 18,
   },
-  menuRow: {
-    borderColor: '#E2E8F0',
+  // The route follows the category card: same block, header and title colors (app-community#1716).
+  routeBlock: {
+    backgroundColor: menuAccessColors.blockBackground,
+    borderColor: menuAccessColors.blockBorder,
     borderRadius: 8,
-    borderWidth: 1,
-    gap: 12,
-    padding: 12,
+    borderWidth: 2,
+    overflow: 'hidden',
   },
-  rowDisabled: {
-    opacity: 0.62,
-  },
-  menuHeader: {
-    alignItems: 'flex-start',
+  routeHeader: {
+    alignItems: 'center',
+    backgroundColor: menuAccessColors.headerBackground,
+    borderBottomColor: menuAccessColors.divider,
+    borderBottomWidth: 1,
     flexDirection: 'row',
     gap: 12,
     justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  routeBody: {
+    gap: 12,
+    padding: 12,
+  },
+  routeTitle: {
+    color: menuAccessColors.textTitle,
+    flexShrink: 1,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  rowDisabled: {
+    opacity: 0.62,
   },
   // Enabled toggle and Save menu share the header's right side (#1467).
   menuHeaderActions: {
@@ -180,11 +198,6 @@ export default StyleSheet.create({
     gap: 3,
     minWidth: 0,
   },
-  menuTitle: {
-    color: '#0F172A',
-    fontSize: 15,
-    fontWeight: '800',
-  },
   menuMeta: {
     color: '#64748B',
     fontSize: 12,
@@ -201,9 +214,9 @@ export default StyleSheet.create({
   },
   // Read-only menu_type badge: HOME / TOOLBAR / CONFIGURATOR (app-community#1662).
   menuTypeBadge: {
-    backgroundColor: '#E2E8F0',
+    backgroundColor: menuAccessColors.badgeBackground,
     borderRadius: 4,
-    color: '#334155',
+    color: menuAccessColors.badgeText,
     fontSize: 10,
     fontWeight: '800',
     overflow: 'hidden',
@@ -228,17 +241,17 @@ export default StyleSheet.create({
     width: 82,
   },
   fieldLabel: {
-    color: '#64748B',
+    color: menuAccessColors.textLabel,
     fontSize: 11,
     fontWeight: '800',
     marginBottom: 5,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     fontSize: 13,
     fontWeight: '700',
     minHeight: 32,
@@ -251,8 +264,8 @@ export default StyleSheet.create({
   },
   colorInputBox: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -264,14 +277,14 @@ export default StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     backgroundColor: 'transparent',
-    borderColor: '#CBD5E1',
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 4,
     borderWidth: 1,
     height: 18,
     width: 18,
   },
   colorInputText: {
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     flex: 1,
     fontSize: 13,
     fontWeight: '700',
@@ -284,11 +297,11 @@ export default StyleSheet.create({
     width: 220,
   },
   compactInput: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     fontSize: 13,
     fontWeight: '700',
     minHeight: 32,
@@ -297,11 +310,11 @@ export default StyleSheet.create({
     paddingVertical: 4,
   },
   orderInput: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     fontSize: 13,
     fontWeight: '700',
     minHeight: 32,
@@ -311,8 +324,8 @@ export default StyleSheet.create({
   },
   selectField: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CBD5E1',
+    backgroundColor: menuAccessColors.inputBackground,
+    borderColor: menuAccessColors.inputBorder,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -323,7 +336,7 @@ export default StyleSheet.create({
     paddingVertical: 4,
   },
   selectText: {
-    color: '#0F172A',
+    color: menuAccessColors.inputText,
     flexShrink: 1,
     fontSize: 13,
     fontWeight: '700',
@@ -373,19 +386,14 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
   },
-  // Trash buttons sit at the bottom-right of the category header and of each item (#1470).
+  // Trash buttons sit at the end of the category header and of each route header, after Save (#1470).
   trashButton: {
     justifyContent: 'center',
-    marginLeft: 'auto',
     minWidth: 32,
     paddingHorizontal: 0,
   },
   menuFooter: {
     alignItems: 'flex-end',
-  },
-  // Trash sits at the end of the first field row, aligned with the inputs (#1650).
-  menuTrashField: {
-    alignSelf: 'flex-end',
   },
   collapseButton: {
     alignItems: 'center',

@@ -23,10 +23,11 @@ test('drafts load and the menu PATCH saves the routeCard colors (#1650)', () => 
   assert.match(src, /\.\.\.pickRouteColors\(draft\)/);
 });
 
-test('legacy route color box is gone and colors sit on their own row below the trash row (#1650)', () => {
+test('legacy route color box is gone and the colors sit on their own rows in the route body (#1650)', () => {
   assert.doesNotMatch(src, /Cor da rota/);
-  const card = src.slice(src.indexOf('styles.menuTrashField'), src.lastIndexOf('availableLinkTypes.map'));
-  assert.ok(card.indexOf('Apagar item de menu') < card.indexOf('ROUTE_CARD_FIELDS.map'));
+  const card = src.slice(src.indexOf('styles.routeBody'), src.lastIndexOf('availableLinkTypes.map'));
+  assert.doesNotMatch(card, /Apagar item de menu/);
+  assert.ok(card.indexOf('ROUTE_CARD_FIELDS.map') > 0);
 });
 
 test('card colors and menu colors sit on separate rows; replicate buttons follow the menu colors (#1650)', () => {
