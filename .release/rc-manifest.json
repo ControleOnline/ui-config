@@ -1,17 +1,17 @@
 {
-  "version": "1.0.53",
+  "version": "1.0.54",
   "rc": 1,
-  "branch": "rc/1.0.53-rc.1",
+  "branch": "rc/1.0.54-rc.1",
   "baseMaster": "42aab846f6e69cfd1c92133afa461cda84d824d8",
   "tasks": [
-    1724
+    1729
   ],
   "frozen": true,
   "repositories": {
-    "ControleOnline/ui-config": "a5a1f66dcb31b4724aa2be905440c205b8d7661e"
+    "ControleOnline/ui-config": "4c263fff91f5d4066e99d59ec236f595ea979fdf"
   },
   "validation": {
-    "scope": "Task 1724 (app-community): espaco de 18px entre o bloco da categoria e a primeira rota e entre as rotas.",
-    "checks": "Testes de contrato menuAccess* 31/31."
+    "scope": "Task 1729 (app-community): lixeiras no header de categoria e rota, a direita de Salvar. Acumula 1716, 1718, 1720 e 1724 (ui-config 1.0.50-1.0.53) para reenvio ao staging.",
+    "checks": "Testes de contrato menuAccess* 32/32."
   }
 }
