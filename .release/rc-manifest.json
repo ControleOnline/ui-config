@@ -1,17 +1,17 @@
 {
-  "version": "1.0.51",
+  "version": "1.0.52",
   "rc": 1,
-  "branch": "rc/1.0.51-rc.1",
+  "branch": "rc/1.0.52-rc.1",
   "baseMaster": "42aab846f6e69cfd1c92133afa461cda84d824d8",
   "tasks": [
-    1718
+    1720
   ],
   "frozen": true,
   "repositories": {
-    "ControleOnline/ui-config": "b5e55173e4fc5eb937b45540494bc4872e64e72d"
+    "ControleOnline/ui-config": "c16b0488a911fed909db10db4dc8bddf39c87ba6"
   },
   "validation": {
-    "scope": "Task 1718 (app-community): cores fixas do miolo (categoria e rotas) do menu-access-config-page centralizadas em MenuAccessConfigPage.colors.js, nomeadas pela funcao, sem duplicidade de valor. Sem mudanca visual.",
-    "checks": "Testes de contrato menuAccess* 29/29 (menuAccessColorTokens novo)."
+    "scope": "Task 1720 (app-community): borda do categoryBlock com 4px e do routeBlock com 2px.",
+    "checks": "Testes de contrato menuAccess* 30/30."
   }
 }
