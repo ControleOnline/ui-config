@@ -47,3 +47,11 @@ test('category and route blocks have 4px and 2px borders', () => {
   assert.match(block('categoryBlock'), /borderWidth: 4,/);
   assert.match(block('routeBlock'), /borderWidth: 2,/);
 });
+
+// 18px between the category block and the first route, and between routes (app-community#1724).
+test('the route list keeps 18px above the first route and between routes', () => {
+  const list = block('menuList');
+  assert.match(list, /gap: 18,/);
+  assert.match(list, /paddingTop: 18,/);
+  assert.match(list, /padding: 12,/);
+});

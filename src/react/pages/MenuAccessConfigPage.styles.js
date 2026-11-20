@@ -142,8 +142,9 @@ export default StyleSheet.create({
     gap: 8,
   },
   menuList: {
-    gap: 10,
+    gap: 18,
     padding: 12,
+    paddingTop: 18,
   },
   // The route follows the category card: same block, header and title colors (app-community#1716).
   routeBlock: {
