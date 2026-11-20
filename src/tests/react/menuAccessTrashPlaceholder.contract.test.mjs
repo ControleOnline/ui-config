@@ -21,3 +21,17 @@ test('trash buttons only announce that delete is unavailable (#1470)', () => {
   // no real deletion: no DELETE request is issued by this screen
   assert.doesNotMatch(src, /method: 'DELETE'/);
 });
+
+// The trash buttons sit in the card headers, to the right of the save buttons (app-community#1729).
+test('trash buttons sit in the headers after Salvar categoria and Salvar menu', () => {
+  const categoryHeader = src.slice(src.indexOf('<View style={styles.categoryHeader}>'), src.indexOf('<View style={styles.categoryFields}>'));
+  assert.ok(categoryHeader.indexOf('Apagar categoria') > categoryHeader.indexOf('Salvar categoria'));
+  const routeHeader = src.slice(src.indexOf('<View style={styles.routeHeader}>'), src.indexOf('<View style={styles.routeBody}>'));
+  assert.ok(routeHeader.indexOf('Apagar item de menu') > routeHeader.indexOf('Salvar menu'));
+  const categoryFields = src.slice(src.indexOf('<View style={styles.categoryFields}>'), src.indexOf('<View style={styles.menuList}>'));
+  assert.doesNotMatch(categoryFields, /Apagar categoria/);
+  const routeBody = src.slice(src.indexOf('<View style={styles.routeBody}>'), src.lastIndexOf('availableLinkTypes.map'));
+  assert.doesNotMatch(routeBody, /Apagar item de menu/);
+  assert.doesNotMatch(src, /menuTrashField/);
+  assert.doesNotMatch(src.slice(src.indexOf('trashButton: {')), /^\s*marginLeft: 'auto'/m);
+});

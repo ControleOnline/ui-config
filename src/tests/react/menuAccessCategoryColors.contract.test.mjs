@@ -26,7 +26,7 @@ test('category color fields map to the new columns with the requested labels (#1
   }
 });
 
-test('colors sit on a second row below name, icon, order and trash (#1648)', () => {
+test('colors sit on a second row below name, icon and order; trash is in the header (#1648, #1729)', () => {
   const card = src.slice(src.indexOf('<View style={styles.categoryFields}>'), src.indexOf('{expanded ? ('));
   const first = card.indexOf('styles.categoryFieldsRow');
   const second = card.indexOf('styles.categoryFieldsRow', first + 1);
@@ -34,7 +34,7 @@ test('colors sit on a second row below name, icon, order and trash (#1648)', () 
   const row1 = card.slice(first, second);
   assert.match(row1, /Nome da categoria/);
   assert.match(row1, /Ordem/);
-  assert.match(row1, /Apagar categoria/);
+  assert.doesNotMatch(row1, /Apagar categoria/);
   assert.doesNotMatch(row1, /CATEGORY_COLOR_FIELDS/);
   assert.match(card.slice(second), /CATEGORY_COLOR_FIELDS\.map/);
 });

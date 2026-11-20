@@ -386,19 +386,14 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
   },
-  // Trash buttons sit at the bottom-right of the category header and of each item (#1470).
+  // Trash buttons sit at the end of the category header and of each route header, after Save (#1470).
   trashButton: {
     justifyContent: 'center',
-    marginLeft: 'auto',
     minWidth: 32,
     paddingHorizontal: 0,
   },
   menuFooter: {
     alignItems: 'flex-end',
-  },
-  // Trash sits at the end of the first field row, aligned with the inputs (#1650).
-  menuTrashField: {
-    alignSelf: 'flex-end',
   },
   collapseButton: {
     alignItems: 'center',

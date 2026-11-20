@@ -910,6 +910,15 @@ export default function MenuAccessConfigPage() {
                       <Icon name="save" size={14} color={palette.buttonIcon} />
                       <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Salvar categoria</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.82}
+                      accessibilityRole="button"
+                      accessibilityLabel="Apagar categoria"
+                      style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
+                      onPress={announceDeleteUnavailable}
+                    >
+                      <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -944,15 +953,6 @@ export default function MenuAccessConfigPage() {
                       placeholder="Ordem"
                     />
                   </View>
-                  <TouchableOpacity
-                    activeOpacity={0.82}
-                    accessibilityRole="button"
-                    accessibilityLabel="Apagar categoria"
-                    style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
-                    onPress={announceDeleteUnavailable}
-                  >
-                    <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
-                  </TouchableOpacity>
                 </View>
                 <View style={styles.categoryFieldsRow}>
                   {CATEGORY_COLOR_FIELDS.map(({field, label}) => (
@@ -1051,6 +1051,15 @@ export default function MenuAccessConfigPage() {
                             <Icon name="save" size={14} color={palette.buttonIcon} />
                             <Text style={[styles.categoryButtonText, {color: palette.buttonText}]}>Salvar menu</Text>
                           </TouchableOpacity>
+                          <TouchableOpacity
+                            activeOpacity={0.82}
+                            accessibilityRole="button"
+                            accessibilityLabel="Apagar item de menu"
+                            style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
+                            onPress={announceDeleteUnavailable}
+                          >
+                            <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
+                          </TouchableOpacity>
                           </View>
                         </View>
                         <View style={styles.routeBody}>
@@ -1115,17 +1124,6 @@ export default function MenuAccessConfigPage() {
                                 keyboardType="numeric"
                                 onChangeText={sortOrder => setMenuDraft(item.id, {sortOrder})}
                               />
-                            </View>
-                            <View style={styles.menuTrashField}>
-                            <TouchableOpacity
-                              activeOpacity={0.82}
-                              accessibilityRole="button"
-                              accessibilityLabel="Apagar item de menu"
-                              style={[styles.categoryButton, styles.trashButton, {backgroundColor: palette.buttonBackground, borderColor: palette.negative || palette.buttonBorder}]}
-                              onPress={announceDeleteUnavailable}
-                            >
-                              <Icon name="trash-2" size={14} color={palette.negative || palette.buttonIcon} />
-                            </TouchableOpacity>
                             </View>
                           </View>
 
