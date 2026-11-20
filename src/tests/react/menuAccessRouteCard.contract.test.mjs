@@ -41,3 +41,9 @@ test('the route header holds the title and the actions; the fields stay in the b
   assert.match(header, /saveMenu\(item\)/);
   assert.doesNotMatch(header, /styles\.formGrid/);
 });
+
+// The category block has a 4px border and the route block a 2px border (app-community#1720).
+test('category and route blocks have 4px and 2px borders', () => {
+  assert.match(block('categoryBlock'), /borderWidth: 4,/);
+  assert.match(block('routeBlock'), /borderWidth: 2,/);
+});

@@ -93,7 +93,7 @@ export default StyleSheet.create({
     backgroundColor: menuAccessColors.blockBackground,
     borderColor: menuAccessColors.blockBorder,
     borderRadius: 8,
-    borderWidth: 1,
+    borderWidth: 4,
     overflow: 'hidden',
   },
   categoryHeader: {
@@ -150,7 +150,7 @@ export default StyleSheet.create({
     backgroundColor: menuAccessColors.blockBackground,
     borderColor: menuAccessColors.blockBorder,
     borderRadius: 8,
-    borderWidth: 1,
+    borderWidth: 2,
     overflow: 'hidden',
   },
   routeHeader: {
