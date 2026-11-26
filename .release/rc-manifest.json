@@ -1,21 +1,20 @@
 {
-  "version": "1.0.55",
+  "version": "1.0.56",
   "rc": 1,
-  "branch": "rc/1.0.55-rc.1",
-  "baseMaster": "42aab846f6e69cfd1c92133afa461cda84d824d8",
+  "branch": "rc/1.0.56-rc.1",
+  "baseMaster": "9946b19e65a7832a2870ccdf8380eb9fc1609f33",
+  "baseTag": "v1.0.55",
   "tasks": [
-    1716,
-    1718,
-    1720,
-    1724,
-    1729
+    1761
   ],
+  "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/ui-config": "84ce50b18638d23284e246fc2d09794a3c92fe3f"
+    "ControleOnline/ui-config": "60ab8e4762c0e886db8b1f686b3666d7fdc6a551"
   },
-  "validation": {
-    "scope": "Promocao ao master do que foi validado no staging como ui-config 1.0.50-1.0.54: routeBlock/routeHeader/routeTitle (1716), tokens de cor do miolo (1718), bordas 4px/2px (1720), espaco 18px (1724) e lixeiras no header (1729). Mesmo conteudo da v1.0.54.",
-    "checks": "Testes de contrato menuAccess* 32/32."
+  "sources": {
+    "versão de produção v1.0.55": "9946b19e65a7832a2870ccdf8380eb9fc1609f33",
+    "staging": "f67aa0a9fe41c6fb43ba43142a5cdf8c8d767f18",
+    "dev": "9a6ba33d13c9e621f26952a736a008554e3c087e"
   }
 }
