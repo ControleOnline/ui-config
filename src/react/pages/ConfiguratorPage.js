@@ -1,9 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useStore } from '@store';
-import { resolveThemePalette } from '@controleonline/../../src/styles/branding';
+import { api } from '@controleonline/ui-common/src/api';
+import {
+  getRuntimeMenuRoutes,
+  normalizeRuntimeMenuResponse,
+} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
+import { resolveThemePalette } from '@controleonline/ui-layout/src/styles/branding';
 import { createStyles } from './ConfiguratorPage.styles';
 
 const tt = (type, key) => global.t?.t('configs', type, key);
@@ -92,6 +97,62 @@ const getConfigActions = () => [
   },
 ];
 
+// Shortcuts are dynamic: each one is a `configurator` menu (menus-people), filtered by the
+// API per profile and enabled flag. The fixed list above is only a fallback used when the
+// menu request fails; an empty response means nothing is allowed and hides every card.
+export const CONFIGURATOR_MENU_TYPE = 'configurator';
+
+export const filterConfigActions = (actions, state) =>
+  state?.status === 'error'
+    ? actions
+    : state?.status === 'ready'
+      ? actions.filter(item => state.routes.has(item.route))
+      : [];
+
+export const useConfiguratorMenu = companyId => {
+  const [state, setState] = useState({ status: 'loading', routes: new Set() });
+
+  useEffect(() => {
+    if (!companyId) {
+      setState({ status: 'loading', routes: new Set() });
+      return undefined;
+    }
+
+    let cancelled = false;
+    setState({ status: 'loading', routes: new Set() });
+
+    api
+      .fetch('menus-people', {
+        params: {
+          myCompany: companyId,
+          appType: 'MANAGER',
+          menuType: CONFIGURATOR_MENU_TYPE,
+        },
+      })
+      .then(result => {
+        if (cancelled) return;
+        if (result?.response?.success === false) {
+          setState({ status: 'error', routes: new Set() });
+          return;
+        }
+        const modules = normalizeRuntimeMenuResponse(result, {
+          appType: 'MANAGER',
+          allowFallback: false,
+        });
+        setState({ status: 'ready', routes: getRuntimeMenuRoutes(modules) });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: 'error', routes: new Set() });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [companyId]);
+
+  return state;
+};
+
 function ActionCard({ styles, colors, label, description, icon, onPress }) {
   return (
     <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} style={styles.actionCard} activeOpacity={0.9} onPress={onPress}>
@@ -111,6 +172,7 @@ export default function ConfiguratorPage({ navigation, presentation = null }) {
   const themeStore = useStore('theme');
   const { currentCompany } = peopleStore.getters;
   const { colors: themeColors } = themeStore.getters;
+  const menuState = useConfiguratorMenu(currentCompany?.id);
 
   const palette = useMemo(
     () =>
@@ -128,7 +190,7 @@ export default function ConfiguratorPage({ navigation, presentation = null }) {
     () => presentation?.styles || createStyles(configuratorColors),
     [presentation?.styles, configuratorColors],
   );
-  const configActions = getConfigActions().map(item => ({
+  const configActions = filterConfigActions(getConfigActions(), menuState).map(item => ({
     ...item,
     ...(presentation?.actionText?.[item.route] || {}),
   }));
@@ -145,14 +207,14 @@ export default function ConfiguratorPage({ navigation, presentation = null }) {
           <Text style={styles.heroEyebrow}>{tt('hub_eyebrow', 'configurator') || 'CONFIGURADOR'}</Text>
           <Text style={styles.heroTitle}>{presentation?.text?.title || tt('hub_title', 'configurationCenter') || 'Central de configuração'}</Text>
           <Text style={styles.heroText}>
-            {presentation?.text?.description || tt('hub_text', 'configurationCenter') ||
+            {tt('hub_text', 'configurationCenter') ||
               'Agrupe conexões, integrações e configurações gerais em um único lugar e deixe a home focada no que realmente precisa aparecer nela.'}
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>{presentation?.text?.sectionTitle || tt('hub_title', 'configuratorAccess') || 'Acessos do configurador'}</Text>
+        <Text style={styles.sectionTitle}>{tt('hub_title', 'configuratorAccess') || 'Acessos do configurador'}</Text>
         <Text style={styles.sectionDescription}>
-          {presentation?.text?.sectionDescription || tt('hub_text', 'configuratorAccess') ||
+          {tt('hub_text', 'configuratorAccess') ||
             'Conexões e integrações deixam de competir por destaque na home e passam a viver dentro deste módulo.'}
         </Text>
 
