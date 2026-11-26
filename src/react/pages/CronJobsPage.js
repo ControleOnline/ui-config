@@ -6,8 +6,8 @@ import Icon from 'react-native-vector-icons/Feather';
 import { useStore } from '@store';
 import { app_type_base } from '@appType';
 import DefaultTable from '@controleonline/ui-default/src/react/components/table/DefaultTable';
-import { resolveThemePalette } from '@controleonline/../../src/styles/branding';
-import { colors } from '@controleonline/../../src/styles/colors';
+import { resolveThemePalette } from '@controleonline/ui-layout/src/styles/branding';
+import { colors } from '@controleonline/ui-layout/src/styles/colors';
 import { userHasRole } from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import styles from './CronJobsPage.styles';
 
